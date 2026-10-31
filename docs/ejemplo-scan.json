@@ -1,0 +1,124 @@
+{
+  "url": "https://orangeember.com/",
+  "fecha": "2026-10-31T15:53:51.112Z",
+  "checks": [
+    {
+      "id": "robots-txt",
+      "estado": "ok",
+      "detalle": "Todos los agentes de IA relevantes pueden acceder al sitio",
+      "evidencia": {
+        "url": "https://orangeember.com/robots.txt",
+        "status": 200,
+        "agentes": {
+          "GPTBot": {
+            "estado": "ok",
+            "detalle": "GPTBot puede acceder a / (allow:/)",
+            "regla": "allow:/",
+            "heredado": false
+          },
+          "ChatGPT-User": {
+            "estado": "ok",
+            "detalle": "ChatGPT-User puede acceder a / (allow:/)",
+            "regla": "allow:/",
+            "heredado": true
+          },
+          "ClaudeBot": {
+            "estado": "ok",
+            "detalle": "ClaudeBot puede acceder a / (allow:/)",
+            "regla": "allow:/",
+            "heredado": true
+          },
+          "PerplexityBot": {
+            "estado": "ok",
+            "detalle": "PerplexityBot puede acceder a / (allow:/)",
+            "regla": "allow:/",
+            "heredado": true
+          },
+          "Google-Extended": {
+            "estado": "ok",
+            "detalle": "Google-Extended puede acceder a / (allow:/)",
+            "regla": "allow:/",
+            "heredado": false
+          }
+        },
+        "gruposEncontrados": [
+          "*",
+          "GPTBot",
+          "CCBot",
+          "Google-Extended",
+          "anthropic-ai",
+          "Claude-Web"
+        ],
+        "lineas": 19
+      }
+    },
+    {
+      "id": "llms-txt",
+      "estado": "fallo",
+      "detalle": "No se encontró llms.txt en ninguna ubicación común",
+      "evidencia": {
+        "variantesProbados": [
+          {
+            "url": "https://orangeember.com/llms.txt",
+            "status": 404,
+            "encontrado": false,
+            "tamano": 0
+          },
+          {
+            "url": "https://orangeember.com/LLMs.txt",
+            "status": 404,
+            "encontrado": false,
+            "tamano": 0
+          },
+          {
+            "url": "https://orangeember.com/.well-known/llms.txt",
+            "status": 404,
+            "encontrado": false,
+            "tamano": 0
+          },
+          {
+            "url": "https://orangeember.com/llm.txt",
+            "status": 404,
+            "encontrado": false,
+            "tamano": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "sitemap",
+      "estado": "fallo",
+      "detalle": "No se encontró un sitemap.xml válido",
+      "evidencia": {
+        "ubicacionesBuscadas": [
+          "/sitemap.xml",
+          "/sitemap_index.xml",
+          "/sitemaps.xml"
+        ]
+      }
+    },
+    {
+      "id": "headers",
+      "estado": "ok",
+      "detalle": "Headers HTTP relevantes revisados; no hay bloqueos por x-robots-tag",
+      "evidencia": {
+        "headers": {
+          "content-type": "text/html"
+        }
+      }
+    },
+    {
+      "id": "rendering",
+      "estado": "ok",
+      "detalle": "El home entrega contenido estático legible sin depender exclusivamente del cliente",
+      "evidencia": {
+        "htmlSizeBytes": 58315,
+        "visibleTextChars": 2279,
+        "visibleWords": 441,
+        "scriptTags": 9,
+        "appShellDetected": false,
+        "bodyTextChars": 2239
+      }
+    }
+  ]
+}
