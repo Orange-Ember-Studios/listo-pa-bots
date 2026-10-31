@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "listo-pa-bots",
+  "compatibility_date": "2026-10-01",
+  // Subdominio propio (DNS en la zona orangeember.com, gestionado por Cloudflare)
+  "routes": [
+    {
+      "pattern": "listopabots.orangeember.com",
+      "custom_domain": true
+    }
+  ]
+}
