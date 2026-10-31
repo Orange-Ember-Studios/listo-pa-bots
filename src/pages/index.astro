@@ -1,30 +1,367 @@
 ---
+const title = 'Listo Pa Bots — Escanea si tu sitio está listo para agentes de IA';
+const description =
+  'Escaneo gratuito de agentic-readiness para dueños de negocio. Descubre si los agentes de IA pueden ver, encontrar y operar tu sitio web.';
+const ogImage = 'https://listopabots.orangeember.com/og-image.png';
 ---
 
 <html lang="es">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content="Escanea sitios web para saber si los agentes de IA pueden verlos, encontrarlos y operarlos." />
-		<title>Listo Pa Bots</title>
-	</head>
-	<body>
-		<main style="max-width: 720px; margin: 0 auto; padding: 2rem; font-family: system-ui, sans-serif;">
-			<h1>Listo Pa Bots</h1>
-			<p>
-				Escáner gratuito de <strong>agentic-readiness</strong>: te dice si los agentes de IA
-				pueden ver, encontrar y operar tu sitio web.
-			</p>
-			<p>
-				Usa el motor de escaneo desde la terminal:
-				<code>npm run scan -- https://tusitio.com</code>
-			</p>
-			<p>
-				Próximamente: informe visual con puntaje 0-100 y recomendaciones para dueños de negocio.
-			</p>
-		</main>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content="https://listopabots.orangeember.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_CO" />
+    <style is:global>
+      :root {
+        --accent: #2563eb;
+        --accent-dark: #1d4ed8;
+        --text: #0f172a;
+        --muted: #64748b;
+        --bg: #ffffff;
+        --surface: #f8fafc;
+        --border: #e2e8f0;
+        --radius: 1rem;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.55;
+        color: var(--text);
+        background: var(--bg);
+      }
+      .container {
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 1.5rem;
+      }
+      .hero {
+        padding: 2.5rem 0 2rem;
+      }
+      .eyebrow {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.75rem;
+      }
+      h1 {
+        font-size: clamp(2rem, 6vw, 3rem);
+        line-height: 1.1;
+        font-weight: 800;
+        margin: 0 0 1rem;
+      }
+      .lead {
+        font-size: clamp(1.125rem, 3vw, 1.375rem);
+        color: var(--muted);
+        margin: 0 0 2rem;
+        max-width: 600px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem;
+      }
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      label {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      input[type='url'],
+      input[type='text'] {
+        width: 100%;
+        font-size: 1.125rem;
+        padding: 1rem 1.25rem;
+        border: 2px solid var(--border);
+        border-radius: 0.75rem;
+        background: var(--bg);
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      input[type='url']:focus,
+      input[type='text']:focus {
+        border-color: var(--accent);
+      }
+      button {
+        cursor: pointer;
+        font: inherit;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 1.125rem;
+        font-weight: 700;
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        border: none;
+        min-height: 3.5rem;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #ffffff;
+      }
+      .btn-primary:hover:not(:disabled) {
+        background: var(--accent-dark);
+      }
+      .btn-primary:disabled {
+        opacity: 0.7;
+        cursor: wait;
+      }
+      .btn-secondary {
+        background: var(--bg);
+        color: var(--accent);
+        border: 2px solid var(--border);
+      }
+      .btn-secondary:hover {
+        border-color: var(--accent);
+      }
+      .spinner {
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 3px solid rgba(255, 255, 255, 0.35);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .status {
+        margin-top: 1rem;
+        padding: 1rem 1.25rem;
+        border-radius: 0.75rem;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        color: #1e3a8a;
+        font-size: 0.9375rem;
+      }
+      .status ul {
+        margin: 0.75rem 0 0;
+        padding-left: 1.25rem;
+      }
+      .status li {
+        margin-bottom: 0.35rem;
+      }
+      .error {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #7f1d1d;
+      }
+      .result {
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        border-radius: var(--radius);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        text-align: center;
+      }
+      .score {
+        font-size: 4.5rem;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--text);
+      }
+      .score span {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .label {
+        margin-top: 0.75rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+      .actions {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      @media (min-width: 480px) {
+        .actions {
+          flex-direction: row;
+          justify-content: center;
+        }
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 0.875rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <section class="hero">
+        <p class="eyebrow">Listo Pa Bots</p>
+        <h1>Descubre si tu sitio web está listo para los agentes de IA</h1>
+        <p class="lead">
+          Escaneo gratuito en segundos. Te decimos si los bots de inteligencia artificial pueden ver,
+          encontrar y operar tu negocio online.
+        </p>
+      </section>
+
+      <section class="card" aria-live="polite">
+        <form id="scan-form" class="form" novalidate>
+          <label for="url">URL de tu sitio</label>
+          <input
+            id="url"
+            name="url"
+            type="text"
+            inputmode="url"
+            autocomplete="url"
+            placeholder="https://tunegocio.com"
+            required
+          />
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            Escanear mi sitio
+          </button>
+        </form>
+
+        <div id="state" class="status" style="display: none;">
+          <strong>Revisando tu sitio...</strong>
+          <ul>
+            <li>Verificamos robots.txt y acceso para agentes</li>
+            <li>Buscamos llms.txt y sitemap.xml</li>
+            <li>Medimos velocidad de carga y renderizado</li>
+          </ul>
+        </div>
+
+        <div id="error" class="status error" style="display: none;"></div>
+
+        <div id="result" class="result" style="display: none;">
+          <div class="score"><span id="score-value">0</span><span>/ 100</span></div>
+          <div class="label" id="score-label">Listo Pa Bots</div>
+          <div class="actions">
+            <a id="report-link" href="#" class="btn btn-primary">Ver el informe completo</a>
+            <button id="copy-link" class="btn btn-secondary" type="button">Copiar enlace</button>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        Hecho por <a href="https://orangeember.com" style="color: var(--accent);">Orange Ember Studios</a>
+      </footer>
+    </main>
+
+    <script>
+      const form = document.getElementById('scan-form');
+      const input = document.getElementById('url');
+      const submitBtn = document.getElementById('submit-btn');
+      const state = document.getElementById('state');
+      const error = document.getElementById('error');
+      const result = document.getElementById('result');
+      const scoreValue = document.getElementById('score-value');
+      const scoreLabel = document.getElementById('score-label');
+      const reportLink = document.getElementById('report-link');
+      const copyLink = document.getElementById('copy-link');
+
+      function normalizeUrl(raw) {
+        let value = raw.trim();
+        if (!value) return '';
+        if (!/^https?:\/\//i.test(value)) {
+          value = 'https://' + value;
+        }
+        return value;
+      }
+
+      function isValidUrl(value) {
+        try {
+          new URL(normalizeUrl(value));
+          return true;
+        } catch {
+          return false;
+        }
+      }
+
+      function setLoading(loading) {
+        submitBtn.disabled = loading;
+        state.style.display = loading ? 'block' : 'none';
+        if (loading) {
+          error.style.display = 'none';
+          result.style.display = 'none';
+        }
+      }
+
+      function showError(message) {
+        error.textContent = message;
+        error.style.display = 'block';
+        state.style.display = 'none';
+      }
+
+      function showResult(data) {
+        scoreValue.textContent = String(data.score);
+        scoreLabel.textContent = data.label;
+        reportLink.href = data.informe_url;
+        result.style.display = 'block';
+        state.style.display = 'none';
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const raw = input.value;
+        if (!isValidUrl(raw)) {
+          showError('Ingresa una URL válida, por ejemplo https://tunegocio.com');
+          return;
+        }
+        setLoading(true);
+        try {
+          const response = await fetch('/api/scan', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ url: normalizeUrl(raw) }),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            throw new Error(data.error || 'El escaneo falló. Intenta de nuevo.');
+          }
+          showResult(data);
+        } catch (err) {
+          showError(err.message || 'No pudimos escanear el sitio. Revisa la URL e intenta de nuevo.');
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      copyLink.addEventListener('click', async () => {
+        const href = reportLink.href;
+        try {
+          await navigator.clipboard.writeText(href);
+          const original = copyLink.textContent;
+          copyLink.textContent = 'Enlace copiado';
+          setTimeout(() => (copyLink.textContent = original), 2000);
+        } catch {
+          window.prompt('Copia este enlace:', href);
+        }
+      });
+    </script>
+  </body>
 </html>

@@ -8,5 +8,11 @@
       "pattern": "listopabots.orangeember.com",
       "custom_domain": true
     }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "REPORTS",
+      "id": "99babb0bb56f4ef3978adcda3757df96"
+    }
   ]
 }

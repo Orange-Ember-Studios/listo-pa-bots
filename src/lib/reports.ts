@@ -3,8 +3,10 @@ import type { ScanOutput } from '../scanner/types.js';
 /**
  * Interfaz de lectura de snapshots de escaneo.
  *
- * En local los snapshots son JSON estaticos servidos desde /reports/.
- * En Cloudflare Workers se leen directamente del binding ASSETS.
+ * Orden de resolucion:
+ * 1. Binding REPORTS (KV) para escaneos en vivo.
+ * 2. Binding ASSETS (snapshots empaquetados en public/reports).
+ * 3. Fetch HTTP (local).
  */
 export interface ReportStore {
   get(id: string, origin: string): Promise<ScanOutput | null>;
@@ -13,6 +15,48 @@ export interface ReportStore {
 function isValidId(id: string): boolean {
   return !!id && !/[\\/]/.test(id);
 }
+
+async function getWorkersEnv(): Promise<Record<string, unknown> | null> {
+  try {
+    const mod = (await import('cloudflare:workers')) as { env?: Record<string, unknown> };
+    return mod.env ?? null;
+  } catch {
+    return null;
+  }
+}
+
+const kvStore: ReportStore = {
+  async get(id, origin) {
+    if (!isValidId(id)) return null;
+    try {
+      const env = await getWorkersEnv();
+      const kv = env?.REPORTS as { get?: (key: string) => Promise<string | null> } | undefined;
+      if (!kv?.get) return null;
+      const raw = await kv.get(`informe/${id}`);
+      if (!raw) return null;
+      return JSON.parse(raw) as ScanOutput;
+    } catch {
+      return null;
+    }
+  },
+};
+
+const assetsStore: ReportStore = {
+  async get(id, origin) {
+    if (!isValidId(id)) return null;
+    try {
+      const env = await getWorkersEnv();
+      const assets = env?.ASSETS as { fetch: typeof fetch } | undefined;
+      if (!assets) return null;
+      const url = new URL(`/reports/${id}.json`, origin).toString();
+      const response = await assets.fetch(new Request(url));
+      if (!response.ok) return null;
+      return (await response.json()) as ScanOutput;
+    } catch {
+      return null;
+    }
+  },
+};
 
 const localHttpStore: ReportStore = {
   async get(id, origin) {
@@ -28,41 +72,12 @@ const localHttpStore: ReportStore = {
   },
 };
 
-const assetsStore: ReportStore = {
-  async get(id, origin) {
-    if (!isValidId(id)) return null;
-    try {
-      const { env } = await import('cloudflare:workers');
-      const assets = (env as unknown as { ASSETS?: { fetch: typeof fetch } }).ASSETS;
-      if (!assets) return null;
-      const url = new URL(`/reports/${id}.json`, origin).toString();
-      const response = await assets.fetch(new Request(url));
-      if (!response.ok) return null;
-      return (await response.json()) as ScanOutput;
-    } catch {
-      return null;
-    }
-  },
-};
-
-async function hasAssetsBinding(): Promise<boolean> {
-  try {
-    const { env } = await import('cloudflare:workers');
-    const assets = (env as unknown as { ASSETS?: { fetch: typeof fetch } }).ASSETS;
-    return typeof assets?.fetch === 'function';
-  } catch {
-    return false;
-  }
-}
-
-export function getStore(assets?: { fetch: typeof fetch }): ReportStore {
-  return assets ? assetsStore : localHttpStore;
-}
-
 export async function getReportById(id: string, origin: string): Promise<ScanOutput | null> {
-  // En produccion (Workers) leemos del binding ASSETS; en local usamos HTTP.
-  if (await hasAssetsBinding()) {
-    return assetsStore.get(id, origin);
-  }
+  const fromKv = await kvStore.get(id, origin);
+  if (fromKv) return fromKv;
+
+  const fromAssets = await assetsStore.get(id, origin);
+  if (fromAssets) return fromAssets;
+
   return localHttpStore.get(id, origin);
 }
