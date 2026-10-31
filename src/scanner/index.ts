@@ -1,9 +1,29 @@
 import type { ScanInput, ScanOutput, ScanContext, CheckResult } from './types.js';
 import { normalizeUrl } from './types.js';
 import { fetchText, withTimeout, DEFAULT_TIMEOUT_MS } from './utils.js';
-import { checkRobots, checkLlms, checkSitemap, checkHeaders, checkRendering } from './checks/index.js';
+import {
+  checkRobots,
+  checkLlms,
+  checkSitemap,
+  checkHeaders,
+  checkRendering,
+  checkAiManifest,
+  checkSchemaAction,
+  checkAccessibility,
+  checkMcpOperability,
+} from './checks/index.js';
 
-const CHECKS = [checkRobots, checkLlms, checkSitemap, checkHeaders, checkRendering];
+const CHECKS = [
+  checkRobots,
+  checkLlms,
+  checkSitemap,
+  checkHeaders,
+  checkRendering,
+  checkAiManifest,
+  checkSchemaAction,
+  checkAccessibility,
+  checkMcpOperability,
+];
 
 export async function scan(input: ScanInput): Promise<ScanOutput> {
   const target = normalizeUrl(input.url);
@@ -43,5 +63,15 @@ export async function scan(input: ScanInput): Promise<ScanOutput> {
   };
 }
 
-export { checkRobots, checkLlms, checkSitemap, checkHeaders, checkRendering };
+export {
+  checkRobots,
+  checkLlms,
+  checkSitemap,
+  checkHeaders,
+  checkRendering,
+  checkAiManifest,
+  checkSchemaAction,
+  checkAccessibility,
+  checkMcpOperability,
+};
 export * from './types.js';

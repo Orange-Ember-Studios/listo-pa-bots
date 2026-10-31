@@ -3,3 +3,7 @@ export { checkLlms } from './llms.js';
 export { checkSitemap } from './sitemap.js';
 export { checkHeaders } from './headers.js';
 export { checkRendering } from './rendering.js';
+export { checkAiManifest } from './ai-manifest.js';
+export { checkSchemaAction } from './schema-action.js';
+export { checkAccessibility } from './accessibility.js';
+export { checkMcpOperability } from './mcp.js';

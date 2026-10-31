@@ -18,6 +18,10 @@ export interface CheckExplanations {
   'llms-txt': Record<CheckState, string>;
   sitemap: Record<CheckState, string>;
   headers: Record<CheckState, string>;
+  'ai-manifest': Record<CheckState, string>;
+  'schema-action': Record<CheckState, string>;
+  accessibility: Record<CheckState, string>;
+  'mcp-operability': Record<CheckState, string>;
 }
 
 export interface Dictionary {
