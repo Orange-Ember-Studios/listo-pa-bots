@@ -14,6 +14,10 @@
     {
       "binding": "REPORTS",
       "id": "99babb0bb56f4ef3978adcda3757df96"
+    },
+    {
+      "binding": "LEADS",
+      "id": "ffecc05c534242108125e934466b91bd"
     }
   ]
 }

@@ -8,6 +8,16 @@ export type { Locale };
 
 const dictionaries: Record<Locale, Dictionary> = { es, en };
 
+const PATH_ALIASES: Record<string, Record<Locale, string>> = {
+  '/': { es: '/', en: '/en/' },
+  '/implementacion': { es: '/implementacion', en: '/en/implementation' },
+  '/implementation': { es: '/implementacion', en: '/en/implementation' },
+  '/privacidad': { es: '/privacidad', en: '/en/privacy' },
+  '/privacy': { es: '/privacidad', en: '/en/privacy' },
+  '/terminos': { es: '/terminos', en: '/en/terms' },
+  '/terms': { es: '/terminos', en: '/en/terms' },
+};
+
 export function t<N extends keyof Dictionary, K extends keyof Dictionary[N]>(
   locale: Locale,
   namespace: N,
@@ -21,15 +31,19 @@ export function format(template: string, vars: Record<string, string | number>):
 }
 
 export function getLocalizedPath(path: string, targetLocale: Locale): string {
-  const hasEnPrefix = path === '/en' || path.startsWith('/en/');
+  const normalized = path || '/';
+  const alias = PATH_ALIASES[normalized]?.[targetLocale];
+  if (alias) return alias;
+
+  const hasEnPrefix = normalized === '/en' || normalized.startsWith('/en/');
   if (targetLocale === 'en') {
-    if (hasEnPrefix) return path;
-    return `/en${path}`;
+    if (hasEnPrefix) return normalized;
+    return `/en${normalized}`;
   }
   if (hasEnPrefix) {
-    return path.replace(/^\/en/, '') || '/';
+    return normalized.replace(/^\/en/, '') || '/';
   }
-  return path;
+  return normalized;
 }
 
 export function getStateLabel(locale: Locale, state: 'ok' | 'parcial' | 'fallo'): string {

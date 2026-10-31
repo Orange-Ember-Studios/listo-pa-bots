@@ -1,0 +1,712 @@
+---
+import '../styles/tokens.css';
+import ThemeInit from './ThemeInit.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import { implementationTiers, monitoringPlans, pricingNote } from '../data/pricing.js';
+import { getLocalizedPath, t, type Locale } from '../i18n/index.js';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const origin = Astro.url.origin;
+const canonicalPath = getLocalizedPath('/implementacion', locale);
+const canonical = `${origin}${canonicalPath}`;
+const ogImage = `${origin}/og-image.png`;
+const title = t(locale, 'implementation', 'metaTitle');
+const description = t(locale, 'implementation', 'metaDescription');
+const ogLocale = t(locale, 'implementation', 'ogLocale');
+const homePath = getLocalizedPath('/', locale);
+const planOptions = t(locale, 'implementation', 'formPlanOptions');
+const messages = {
+  invalidUrl: t(locale, 'errors', 'invalidUrl'),
+  leadInvalidEmail: t(locale, 'errors', 'leadInvalidEmail'),
+  leadRateLimited: t(locale, 'errors', 'leadRateLimited'),
+  leadHoneypot: t(locale, 'errors', 'leadHoneypot'),
+  leadGeneric: t(locale, 'errors', 'leadGeneric'),
+  successTitle: t(locale, 'implementation', 'successTitle'),
+  successPlanLabel: t(locale, 'implementation', 'successPlanLabel'),
+  successResponse: t(locale, 'implementation', 'successResponse'),
+  successCta: t(locale, 'implementation', 'successCta'),
+  copied: t(locale, 'informe', 'badgeCopied'),
+  lang: locale,
+};
+---
+
+<html lang={locale}>
+  <head>
+    <ThemeInit />
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={`${origin}/implementacion`} />
+    <link rel="alternate" hreflang="en" href={`${origin}/en/implementation`} />
+    <link rel="alternate" hreflang="x-default" href={`${origin}/implementacion`} />
+    <title>{title}</title>
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={ogLocale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+  </head>
+  <body>
+    <Header locale={locale} />
+
+    <main class="container">
+      <section class="hero" aria-labelledby="implementation-title">
+        <h1 id="implementation-title" class="hero-title">{t(locale, 'implementation', 'title')}</h1>
+        <p class="lead">{t(locale, 'implementation', 'lead')}</p>
+      </section>
+
+      <section class="steps" aria-labelledby="steps-title">
+        <h2 id="steps-title" class="section-title">{t(locale, 'implementation', 'howTitle')}</h2>
+        <ol class="steps-list">
+          {
+            t(locale, 'implementation', 'steps').map((step, index) => (
+              <li>
+                <span class="step-number" aria-hidden="true">{index + 1}</span>
+                <span class="step-text">{step}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="pricing" aria-labelledby="pricing-title">
+        <h2 id="pricing-title" class="section-title">{t(locale, 'landing', 'pricingTitle')}</h2>
+        <div class="pricing-grid">
+          {
+            implementationTiers.map((tier) => (
+              <article class="pricing-card">
+                <h3>{tier.name[locale]}</h3>
+                <p class="pricing-price">{tier.price[locale]}</p>
+                <p class="pricing-description">{tier.description[locale]}</p>
+                <p class="pricing-includes">{tier.includes[locale]}</p>
+                <ul>
+                  {tier.features.map((item) => (
+                    <li>{item[locale]}</li>
+                  ))}
+                </ul>
+                <button type="button" class="btn btn-secondary select-plan" data-plan={tier.id}>
+                  {t(locale, 'implementation', 'pricingCta')}
+                </button>
+              </article>
+            ))
+          }
+        </div>
+
+        <div class="monitoring">
+          <h3>{t(locale, 'landing', 'pricingMonitoringTitle')}</h3>
+          <div class="monitoring-grid">
+            {
+              monitoringPlans.map((plan) => (
+                <article class="pricing-card monitoring-card">
+                  <h4>{plan.name[locale]}</h4>
+                  <p class="pricing-price">{plan.price[locale]}</p>
+                  <p class="pricing-description">{plan.description[locale]}</p>
+                  <ul>
+                    {plan.features.map((item) => (
+                      <li>{item[locale]}</li>
+                    ))}
+                  </ul>
+                  <button type="button" class="btn btn-secondary select-plan" data-plan={plan.id === 'full' ? 'monitoring' : 'monitoring'}>
+                    {t(locale, 'implementation', 'pricingCta')}
+                  </button>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+
+        <p class="pricing-note">
+          <span class="pricing-note-dot" aria-hidden="true" />
+          {pricingNote[locale]}
+        </p>
+      </section>
+
+      <section class="form-section" aria-labelledby="form-title">
+        <h2 id="form-title" class="section-title">{t(locale, 'implementation', 'formTitle')}</h2>
+
+        <div id="lead-form-card" class="lead-card">
+          <form id="lead-form" class="lead-form" novalidate>
+            <div class="field">
+              <label for="url">{t(locale, 'implementation', 'formUrlLabel')}</label>
+              <input
+                id="url"
+                name="url"
+                type="text"
+                inputmode="url"
+                autocomplete="url"
+                placeholder={t(locale, 'implementation', 'formUrlPlaceholder')}
+                required
+              />
+            </div>
+
+            <div class="field field-honeypot" aria-hidden="true">
+              <label for="website">No llene este campo</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label for="name">{t(locale, 'implementation', 'formNameLabel')}</label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                placeholder={t(locale, 'implementation', 'formNamePlaceholder')}
+              />
+            </div>
+
+            <div class="field">
+              <label for="email">{t(locale, 'implementation', 'formEmailLabel')}</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder={t(locale, 'implementation', 'formEmailPlaceholder')}
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="plan">{t(locale, 'implementation', 'formPlanLabel')}</label>
+              <select id="plan" name="plan" required>
+                {planOptions.map((option) => <option value={option.value}>{option.label}</option>)}
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="lead-submit">
+              <span class="btn-text">{t(locale, 'implementation', 'formSubmit')}</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </form>
+
+          <div id="lead-error" class="state state-error" style="display: none;"></div>
+        </div>
+
+        <div id="lead-success" class="lead-card lead-success" style="display: none;">
+          <h3>{messages.successTitle}</h3>
+          <p><strong>{messages.successPlanLabel}</strong> <span id="success-plan"></span></p>
+          <p>{messages.successResponse}</p>
+          <a href={homePath} class="btn btn-primary">{messages.successCta}</a>
+        </div>
+      </section>
+
+      <Footer locale={locale} currentPath={canonicalPath} />
+    </main>
+
+    <style is:global>
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 0 var(--space-md);
+      }
+
+      .site-header {
+        padding: var(--space-md) 0;
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-md);
+      }
+
+      .header-controls {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+
+      .hero {
+        padding: var(--space-xl) 0 var(--space-lg);
+        text-align: center;
+      }
+
+      .hero-title {
+        font-size: clamp(2rem, 8vw, 3rem);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        margin: 0 0 var(--space-md);
+        text-wrap: balance;
+      }
+
+      .lead {
+        font-size: clamp(1.0625rem, 3.5vw, 1.25rem);
+        font-weight: 300;
+        line-height: 1.55;
+        color: var(--text-muted);
+        margin: 0 auto;
+        max-width: 560px;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 var(--space-lg);
+      }
+
+      .steps {
+        padding-bottom: var(--space-2xl);
+      }
+
+      .steps-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: var(--space-md);
+      }
+
+      .steps-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-md);
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+      }
+
+      .step-number {
+        display: inline-grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        background: var(--accent-gradient);
+        color: #fff;
+        font-weight: 800;
+        font-size: 1rem;
+      }
+
+      .step-text {
+        font-size: 0.9375rem;
+        line-height: 1.5;
+        color: var(--text);
+        padding-top: 0.35rem;
+      }
+
+      .pricing {
+        padding-bottom: var(--space-2xl);
+      }
+
+      .pricing-grid {
+        display: grid;
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+      }
+
+      @media (min-width: 720px) {
+        .pricing-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .monitoring-grid {
+        display: grid;
+        gap: var(--space-md);
+      }
+
+      @media (min-width: 560px) {
+        .monitoring-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .pricing-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .pricing-card h3,
+      .pricing-card h4 {
+        margin: 0 0 var(--space-xs);
+        font-size: 1.125rem;
+        font-weight: 800;
+      }
+
+      .pricing-price {
+        margin: 0 0 var(--space-sm);
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: var(--accent-1);
+      }
+
+      .pricing-description {
+        margin: 0 0 var(--space-sm);
+        font-size: 0.9375rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .pricing-includes {
+        margin: 0 0 var(--space-xs);
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text);
+      }
+
+      .pricing-card ul {
+        margin: 0 0 var(--space-md);
+        padding-left: 1.25rem;
+        font-size: 0.9375rem;
+        color: var(--text-muted);
+        line-height: 1.55;
+        flex: 1 1 auto;
+      }
+
+      .pricing-card li {
+        margin-bottom: 0.35rem;
+      }
+
+      .pricing-card .btn {
+        width: 100%;
+      }
+
+      .monitoring {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        margin-bottom: var(--space-md);
+      }
+
+      .monitoring > h3 {
+        text-align: center;
+        margin: 0 0 var(--space-md);
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      .monitoring-card {
+        border: 1px solid var(--border);
+      }
+
+      .pricing-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-xs);
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9375rem;
+        margin-bottom: var(--space-md);
+      }
+
+      .pricing-note-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent-secondary);
+      }
+
+      .form-section {
+        padding-bottom: var(--space-2xl);
+      }
+
+      .lead-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        box-shadow: var(--shadow);
+      }
+
+      @media (min-width: 640px) {
+        .lead-card {
+          padding: var(--space-lg);
+        }
+      }
+
+      .lead-form {
+        display: grid;
+        gap: var(--space-md);
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .field label {
+        font-size: 0.9375rem;
+        font-weight: 600;
+      }
+
+      .field input,
+      .field select {
+        font-size: 1rem;
+        padding: var(--space-sm) var(--space-md);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+        background: var(--bg);
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        min-height: 3rem;
+      }
+
+      .field input::placeholder {
+        color: var(--text-muted);
+        opacity: 1;
+      }
+
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--accent-1);
+        box-shadow: 0 0 0 3px var(--accent-glow);
+      }
+
+      .field-honeypot {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-xs);
+        font-size: 1rem;
+        font-weight: 700;
+        padding: var(--space-sm) var(--space-md);
+        border-radius: var(--radius-pill);
+        border: 1px solid transparent;
+        min-height: 3rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+
+      .btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+      }
+
+      .btn-primary {
+        background: var(--accent-gradient);
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 8px 28px var(--accent-glow);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        box-shadow: 0 12px 36px var(--accent-glow), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--border);
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        border-color: var(--accent-1);
+        color: var(--accent-1);
+      }
+
+      .btn:disabled {
+        opacity: 0.8;
+        cursor: wait;
+      }
+
+      .btn .spinner {
+        display: none;
+      }
+
+      .btn[aria-busy='true'] .btn-text {
+        display: none;
+      }
+
+      .btn[aria-busy='true'] .spinner {
+        display: inline-block;
+      }
+
+      .spinner {
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 3px solid rgba(255, 255, 255, 0.35);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .state-error {
+        margin-top: var(--space-md);
+        padding: var(--space-md);
+        border-radius: var(--radius-md);
+        background: var(--state-fallo-bg);
+        border: 1px solid var(--state-fallo);
+        color: var(--state-fallo);
+        font-size: 0.9375rem;
+      }
+
+      .lead-success {
+        text-align: center;
+      }
+
+      .lead-success h3 {
+        margin: 0 0 var(--space-sm);
+        font-size: 1.5rem;
+      }
+
+      .lead-success p {
+        margin: 0 0 var(--space-md);
+        color: var(--text-muted);
+      }
+    </style>
+
+    <script define:vars={{ messages, planOptions }}>
+      var form = document.getElementById('lead-form');
+      var formCard = document.getElementById('lead-form-card');
+      var successCard = document.getElementById('lead-success');
+      var errorEl = document.getElementById('lead-error');
+      var submitBtn = document.getElementById('lead-submit');
+      var planSelect = document.getElementById('plan');
+      var successPlan = document.getElementById('success-plan');
+
+      function normalizeUrl(raw) {
+        var value = raw.trim();
+        if (!value) return '';
+        if (!/^https?:\/\//i.test(value)) {
+          value = 'https://' + value;
+        }
+        return value;
+      }
+
+      function isValidUrl(value) {
+        try {
+          new URL(normalizeUrl(value));
+          return true;
+        } catch {
+          return false;
+        }
+      }
+
+      function isValidEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+      }
+
+      function setLoading(loading) {
+        submitBtn.disabled = loading;
+        submitBtn.setAttribute('aria-busy', String(loading));
+      }
+
+      function showError(message) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+
+      function planLabel(value) {
+        var option = planOptions.find(function (o) {
+          return o.value === value;
+        });
+        return option ? option.label : value;
+      }
+
+      document.querySelectorAll('.select-plan').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var plan = btn.getAttribute('data-plan') || 'basica';
+          planSelect.value = plan;
+          document.getElementById('lead-form-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        errorEl.style.display = 'none';
+
+        var url = document.getElementById('url').value;
+        var name = document.getElementById('name').value;
+        var email = document.getElementById('email').value;
+        var plan = planSelect.value;
+        var honeypot = document.getElementById('website').value;
+
+        if (!isValidUrl(url)) {
+          showError(messages.invalidUrl);
+          return;
+        }
+        if (!isValidEmail(email)) {
+          showError(messages.leadInvalidEmail);
+          return;
+        }
+
+        setLoading(true);
+        try {
+          var response = await fetch('/api/lead', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              url: normalizeUrl(url),
+              name: name.trim() || undefined,
+              email: email.trim(),
+              plan: plan,
+              website: honeypot,
+            }),
+          });
+          var data = await response.json().catch(function () {
+            return {};
+          });
+          if (!response.ok) {
+            throw new Error(data.error || messages.leadGeneric);
+          }
+          successPlan.textContent = planLabel(plan);
+          formCard.style.display = 'none';
+          successCard.style.display = 'block';
+          successCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (err) {
+          showError(err.message || messages.leadGeneric);
+        } finally {
+          setLoading(false);
+        }
+      });
+    </script>
+  </body>
+</html>

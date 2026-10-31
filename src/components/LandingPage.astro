@@ -2,7 +2,9 @@
 import '../styles/tokens.css';
 import ThemeInit from './ThemeInit.astro';
 import Header from './Header.astro';
-import { format, getLocalizedPath, t, type Locale } from '../i18n/index.js';
+import Footer from './Footer.astro';
+import { implementationTiers, monitoringPlans, pricingNote } from '../data/pricing.js';
+import { getLocalizedPath, t, type Locale } from '../i18n/index.js';
 
 interface Props {
   locale: Locale;
@@ -20,6 +22,7 @@ const eyebrow = t(locale, 'landing', 'eyebrow');
 const h1 = t(locale, 'landing', 'h1');
 const lead = t(locale, 'landing', 'lead');
 const featureItems = t(locale, 'landing', 'featureItems');
+const implementationPath = getLocalizedPath('/implementacion', locale);
 
 const messages = {
   invalidUrlError: t(locale, 'landing', 'invalidUrlError'),
@@ -155,12 +158,67 @@ const messages = {
         </div>
       </section>
 
-      <footer class="site-footer">
-        <p>
-          {format(t(locale, 'landing', 'footerMadeBy'), { studio: 'Orange Ember Studios' })} ·
-          <a href="https://github.com/Orange-Ember-Studios/listo-pa-bots">{t(locale, 'landing', 'footerOpenSource')}</a>
+      <section class="pricing" aria-labelledby="pricing-title">
+        <h2 id="pricing-title" class="section-title">{t(locale, 'landing', 'pricingTitle')}</h2>
+        <p class="pricing-subtitle">{t(locale, 'landing', 'pricingSubtitle')}</p>
+
+        <div class="pricing-grid">
+          {
+            implementationTiers.map((tier) => (
+              <article class="pricing-card">
+                <h3>{tier.name[locale]}</h3>
+                <p class="pricing-price">{tier.price[locale]}</p>
+                <p class="pricing-description">{tier.description[locale]}</p>
+                <p class="pricing-includes">{tier.includes[locale]}</p>
+                <ul>
+                  {tier.features.map((item) => (
+                    <li>{item[locale]}</li>
+                  ))}
+                </ul>
+                <a href={implementationPath} class="btn btn-primary">
+                  {t(locale, 'landing', 'pricingCta')}
+                </a>
+              </article>
+            ))
+          }
+        </div>
+
+        <div class="monitoring">
+          <h3>{t(locale, 'landing', 'pricingMonitoringTitle')}</h3>
+          <div class="monitoring-grid">
+            {
+              monitoringPlans.map((plan) => (
+                <article class="pricing-card monitoring-card">
+                  <h4>{plan.name[locale]}</h4>
+                  <p class="pricing-price">{plan.price[locale]}</p>
+                  <p class="pricing-description">{plan.description[locale]}</p>
+                  <ul>
+                    {plan.features.map((item) => (
+                      <li>{item[locale]}</li>
+                    ))}
+                  </ul>
+                  <a href={implementationPath} class="btn btn-secondary">
+                    {t(locale, 'landing', 'pricingCta')}
+                  </a>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+
+        <p class="pricing-note">
+          <span class="pricing-note-dot" aria-hidden="true" />
+          {pricingNote[locale]}
         </p>
-      </footer>
+
+        <div class="pricing-cta">
+          <a href={implementationPath} class="btn btn-primary">
+            {t(locale, 'landing', 'pricingCta')}
+          </a>
+        </div>
+      </section>
+
+      <Footer locale={locale} currentPath={canonicalPath} />
     </main>
 
     <style is:global>
@@ -621,24 +679,136 @@ const messages = {
         line-height: 1.5;
       }
 
-      .site-footer {
-        margin-top: var(--space-xl);
-        padding: var(--space-lg) 0 var(--space-2xl);
-        border-top: 1px solid var(--border);
+      .pricing {
+        padding-bottom: var(--space-2xl);
+      }
+
+      .pricing-subtitle {
         text-align: center;
         color: var(--text-muted);
-        font-size: 0.875rem;
+        margin: calc(var(--space-sm) * -1) 0 var(--space-lg);
       }
 
-      .site-footer a {
-        color: var(--text);
-        text-decoration: underline;
-        text-underline-offset: 2px;
+      .pricing-grid {
+        display: grid;
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
       }
 
-      .site-footer a:hover {
+      @media (min-width: 720px) {
+        .pricing-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .monitoring-grid {
+        display: grid;
+        gap: var(--space-md);
+      }
+
+      @media (min-width: 560px) {
+        .monitoring-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .pricing-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .pricing-card h3,
+      .pricing-card h4 {
+        margin: 0 0 var(--space-xs);
+        font-size: 1.125rem;
+        font-weight: 800;
+      }
+
+      .pricing-price {
+        margin: 0 0 var(--space-sm);
+        font-size: 1.0625rem;
+        font-weight: 700;
         color: var(--accent-1);
       }
+
+      .pricing-description {
+        margin: 0 0 var(--space-sm);
+        font-size: 0.9375rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .pricing-includes {
+        margin: 0 0 var(--space-xs);
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text);
+      }
+
+      .pricing-card ul {
+        margin: 0 0 var(--space-md);
+        padding-left: 1.25rem;
+        font-size: 0.9375rem;
+        color: var(--text-muted);
+        line-height: 1.55;
+        flex: 1 1 auto;
+      }
+
+      .pricing-card li {
+        margin-bottom: 0.35rem;
+      }
+
+      .pricing-card .btn {
+        width: 100%;
+      }
+
+      .monitoring {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        margin-bottom: var(--space-md);
+      }
+
+      .monitoring > h3 {
+        text-align: center;
+        margin: 0 0 var(--space-md);
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      .monitoring-card {
+        border: 1px solid var(--border);
+      }
+
+      .pricing-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-xs);
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9375rem;
+        margin-bottom: var(--space-md);
+      }
+
+      .pricing-note-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent-secondary);
+      }
+
+      .pricing-cta {
+        text-align: center;
+      }
+
     </style>
 
     <script define:vars={{ messages }}>

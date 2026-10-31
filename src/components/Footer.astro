@@ -1,0 +1,93 @@
+---
+import type { Locale } from '../i18n/index.js';
+import { getLocalizedPath, t } from '../i18n/index.js';
+import LanguageSelector from './LanguageSelector.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  locale: Locale;
+  currentPath: string;
+}
+
+const { locale, currentPath } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="https://orangeember.com" class="footer-studio">{t(locale, 'common', 'footerStudio')}</a>
+      <span class="footer-sep">·</span>
+      <a href={getLocalizedPath('/implementacion', locale)}>{t(locale, 'common', 'footerImplementation')}</a>
+      <span class="footer-sep">·</span>
+      <a href={getLocalizedPath('/privacidad', locale)}>{t(locale, 'common', 'footerPrivacy')}</a>
+      <span class="footer-sep">·</span>
+      <a href={getLocalizedPath('/terminos', locale)}>{t(locale, 'common', 'footerTerms')}</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/Orange-Ember-Studios/listo-pa-bots">{t(locale, 'common', 'footerOpenSource')}</a>
+    </div>
+    <div class="footer-controls">
+      <LanguageSelector locale={locale} currentPath={currentPath} />
+      <ThemeToggle locale={locale} />
+    </div>
+  </div>
+</footer>
+
+<style is:global>
+  .site-footer {
+    margin-top: var(--space-xl);
+    padding: var(--space-lg) 0 var(--space-2xl);
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    text-align: center;
+  }
+
+  @media (min-width: 640px) {
+    .footer-inner {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+    }
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    line-height: 1.8;
+  }
+
+  .footer-brand a {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .footer-brand a:hover {
+    color: var(--accent-1);
+  }
+
+  .footer-studio {
+    font-weight: 700;
+  }
+
+  .footer-sep {
+    opacity: 0.5;
+  }
+
+  .footer-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+  }
+</style>

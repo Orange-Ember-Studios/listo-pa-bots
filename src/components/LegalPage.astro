@@ -1,0 +1,157 @@
+---
+import '../styles/tokens.css';
+import ThemeInit from './ThemeInit.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import { getLocalizedPath, t, type Locale } from '../i18n/index.js';
+
+interface Props {
+  locale: Locale;
+  metaTitle: string;
+  metaDescription: string;
+  pageTitle: string;
+  canonicalPath: string;
+}
+
+const { locale, metaTitle, metaDescription, pageTitle, canonicalPath } = Astro.props;
+const origin = Astro.url.origin;
+const canonical = `${origin}${canonicalPath}`;
+const ogImage = `${origin}/og-image.png`;
+const ogLocale = t(locale, 'legal', 'lastUpdated');
+---
+
+<html lang={locale}>
+  <head>
+    <ThemeInit />
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={metaDescription} />
+    <link rel="canonical" href={canonical} />
+    {
+      canonicalPath === '/privacidad' || canonicalPath === '/en/privacy' ? (
+        <>
+          <link rel="alternate" hreflang="es" href={`${origin}/privacidad`} />
+          <link rel="alternate" hreflang="en" href={`${origin}/en/privacy`} />
+          <link rel="alternate" hreflang="x-default" href={`${origin}/privacidad`} />
+        </>
+      ) : (
+        <>
+          <link rel="alternate" hreflang="es" href={`${origin}/terminos`} />
+          <link rel="alternate" hreflang="en" href={`${origin}/en/terms`} />
+          <link rel="alternate" hreflang="x-default" href={`${origin}/terminos`} />
+        </>
+      )
+    }
+    <title>{metaTitle}</title>
+    <meta property="og:title" content={metaTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={locale === 'es' ? 'es_CO' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={metaTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={ogImage} />
+  </head>
+  <body>
+    <Header locale={locale} />
+
+    <main class="container">
+      <article class="legal-card">
+        <h1>{pageTitle}</h1>
+        <p class="last-updated">{ogLocale}</p>
+        <slot />
+      </article>
+
+      <Footer locale={locale} currentPath={canonicalPath} />
+    </main>
+
+    <style is:global>
+      .container {
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0 var(--space-md);
+      }
+
+      .site-header {
+        padding: var(--space-md) 0;
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-md);
+      }
+
+      .header-controls {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+
+      .legal-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg) var(--space-md);
+        margin: var(--space-xl) 0 var(--space-2xl);
+        box-shadow: var(--shadow);
+      }
+
+      @media (min-width: 640px) {
+        .legal-card {
+          padding: var(--space-xl);
+        }
+      }
+
+      .legal-card h1 {
+        font-size: clamp(1.75rem, 6vw, 2.25rem);
+        font-weight: 800;
+        margin: 0 0 var(--space-sm);
+        line-height: 1.15;
+      }
+
+      .legal-card h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: var(--space-lg) 0 var(--space-sm);
+      }
+
+      .legal-card p,
+      .legal-card li {
+        font-size: 1rem;
+        line-height: 1.65;
+        color: var(--text-muted);
+      }
+
+      .legal-card ul {
+        padding-left: 1.25rem;
+        margin: 0 0 var(--space-md);
+      }
+
+      .legal-card li {
+        margin-bottom: 0.5rem;
+      }
+
+      .legal-card a {
+        color: var(--accent-1);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      .last-updated {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin: 0 0 var(--space-lg);
+      }
+    </style>
+  </body>
+</html>

@@ -24,6 +24,11 @@ export interface CheckExplanations {
   'mcp-operability': Record<CheckState, string>;
 }
 
+export interface PlanOption {
+  value: string;
+  label: string;
+}
+
 export interface Dictionary {
   landing: {
     metaTitle: string;
@@ -49,8 +54,11 @@ export interface Dictionary {
     breakdownLabel: string;
     featuresTitle: string;
     featureItems: FeatureItem[];
-    footerMadeBy: string;
-    footerOpenSource: string;
+    pricingTitle: string;
+    pricingSubtitle: string;
+    pricingNote: string;
+    pricingCta: string;
+    pricingMonitoringTitle: string;
   };
   informe: {
     metaTitle: string;
@@ -70,6 +78,48 @@ export interface Dictionary {
     labelSubtitleFallo: string;
     footerGeneratedBy: string;
     footerStudio: string;
+    badgeTitle: string;
+    badgeCopy: string;
+    badgeCopied: string;
+  };
+  implementation: {
+    metaTitle: string;
+    metaDescription: string;
+    ogLocale: string;
+    title: string;
+    lead: string;
+    howTitle: string;
+    steps: string[];
+    pricingNote: string;
+    pricingCta: string;
+    formTitle: string;
+    formUrlLabel: string;
+    formUrlPlaceholder: string;
+    formNameLabel: string;
+    formNamePlaceholder: string;
+    formEmailLabel: string;
+    formEmailPlaceholder: string;
+    formPlanLabel: string;
+    formPlanOptions: PlanOption[];
+    formSubmit: string;
+    successTitle: string;
+    successPlanLabel: string;
+    successResponse: string;
+    successCta: string;
+  };
+  legal: {
+    privacyMetaTitle: string;
+    privacyMetaDescription: string;
+    termsMetaTitle: string;
+    termsMetaDescription: string;
+    lastUpdated: string;
+  };
+  common: {
+    footerStudio: string;
+    footerPrivacy: string;
+    footerTerms: string;
+    footerImplementation: string;
+    footerOpenSource: string;
   };
   ui: {
     themeToggleLabel: string;
@@ -85,5 +135,9 @@ export interface Dictionary {
     scanTimeout: string;
     scanFailed: string;
     reportNotFound: string;
+    leadInvalidEmail: string;
+    leadRateLimited: string;
+    leadHoneypot: string;
+    leadGeneric: string;
   };
 }

@@ -1,0 +1,35 @@
+---
+import LegalPage from '../../components/LegalPage.astro';
+import { t } from '../../i18n/index.js';
+---
+
+<LegalPage
+  locale="en"
+  metaTitle={t('en', 'legal', 'privacyMetaTitle')}
+  metaDescription={t('en', 'legal', 'privacyMetaDescription')}
+  pageTitle="Privacy policy"
+  canonicalPath="/en/privacy"
+>
+  <h2>What data we collect</h2>
+  <p>
+    When you use the free scanner we store the URL you entered and the public scan result (the
+    report). If you submit an implementation request, we also store your email and, optionally, your
+    name and the plan you are interested in.
+  </p>
+
+  <h2>How we use that data</h2>
+  <ul>
+    <li>The scanned URL is used to generate the public agentic-readiness report.</li>
+    <li>Your email is used only to reply with a quote and coordinate implementation.</li>
+    <li>Public reports are accessible to anyone who has the link.</li>
+  </ul>
+
+  <h2>Who we share it with</h2>
+  <p>We do not sell or share your data with third parties. Information is stored in Cloudflare KV under our account.</p>
+
+  <h2>Your rights</h2>
+  <p>
+    You can ask us to delete your implementation request by emailing hola@orangeember.com. Public
+    reports remain active while the link is valid.
+  </p>
+</LegalPage>

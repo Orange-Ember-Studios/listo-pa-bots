@@ -1,0 +1,36 @@
+---
+import LegalPage from '../../components/LegalPage.astro';
+import { t } from '../../i18n/index.js';
+---
+
+<LegalPage
+  locale="en"
+  metaTitle={t('en', 'legal', 'termsMetaTitle')}
+  metaDescription={t('en', 'legal', 'termsMetaDescription')}
+  pageTitle="Terms of use"
+  canonicalPath="/en/terms"
+>
+  <h2>Free scanner</h2>
+  <p>
+    The scan is free and generates a public report accessible by link. We do not guarantee 100%
+    uptime or that every AI agent will interpret the results the same way.
+  </p>
+
+  <h2>Public reports</h2>
+  <p>
+    Anyone with the link can view the report. We do not include personal data, only the scanned URL
+    and the technical score.
+  </p>
+
+  <h2>Implementation services</h2>
+  <p>
+    Published prices are reference values. The final quote depends on the size and complexity of
+    the site. Work is coordinated by email and invoiced before we start.
+  </p>
+
+  <h2>Limitation of liability</h2>
+  <p>
+    Listo Pa Bots is a diagnostic tool. We are not liable for changes in rankings, traffic, or
+    third-party agent behavior after using the tool or hiring the implementation service.
+  </p>
+</LegalPage>

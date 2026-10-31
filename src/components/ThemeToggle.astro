@@ -95,8 +95,8 @@ const title = t(locale, 'ui', 'themeToggleTitle');
 
 <script is:inline>
   (function () {
-    const btn = document.querySelector('[data-theme-toggle]');
-    if (!btn) return;
+    var buttons = document.querySelectorAll('[data-theme-toggle]');
+    if (!buttons.length) return;
 
     function apply(theme) {
       document.documentElement.setAttribute('data-theme', theme);
@@ -105,9 +105,13 @@ const title = t(locale, 'ui', 'themeToggleTitle');
       } catch {}
     }
 
-    btn.addEventListener('click', function () {
-      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    function toggle() {
+      var current = document.documentElement.getAttribute('data-theme') || 'dark';
       apply(current === 'dark' ? 'light' : 'dark');
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', toggle);
     });
   })();
 </script>

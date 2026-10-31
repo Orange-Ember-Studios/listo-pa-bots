@@ -1,0 +1,35 @@
+---
+import LegalPage from '../components/LegalPage.astro';
+import { t } from '../i18n/index.js';
+---
+
+<LegalPage
+  locale="es"
+  metaTitle={t('es', 'legal', 'privacyMetaTitle')}
+  metaDescription={t('es', 'legal', 'privacyMetaDescription')}
+  pageTitle="Política de privacidad"
+  canonicalPath="/privacidad"
+>
+  <h2>Qué datos recopilamos</h2>
+  <p>
+    Cuando usas el escáner gratuito guardamos la URL que ingresaste y el resultado público del
+    análisis (el informe). Si envías una solicitud de implementación, también guardamos tu email y,
+    opcionalmente, tu nombre y el plan que te interesa.
+  </p>
+
+  <h2>Cómo usamos esos datos</h2>
+  <ul>
+    <li>La URL escaneada sirve para generar el informe público de agentic-readiness.</li>
+    <li>Tu email se usa solo para responderte la cotización y coordinar la implementación.</li>
+    <li>Los informes públicos son accesibles por quien tenga el enlace.</li>
+  </ul>
+
+  <h2>Con quién compartimos tus datos</h2>
+  <p>No vendemos ni compartimos tus datos con terceros. La información se almacena en Cloudflare KV dentro de nuestra cuenta.</p>
+
+  <h2>Tus derechos</h2>
+  <p>
+    Puedes pedirnos que borremos tu solicitud de implementación escribiendo a hola@orangeember.com.
+    Los informes públicos se mantienen activos mientras el enlace sea válido.
+  </p>
+</LegalPage>

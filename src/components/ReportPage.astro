@@ -2,6 +2,7 @@
 import '../styles/tokens.css';
 import ThemeInit from './ThemeInit.astro';
 import Header from './Header.astro';
+import Footer from './Footer.astro';
 import { format, getLocalizedPath, getCheckExplanation, getStateLabel, t, type Locale } from '../i18n/index.js';
 import type { ScoreResult } from '../scoring/index.js';
 import type { ScanOutput } from '../scanner/types.js';
@@ -31,6 +32,17 @@ const formattedDate = new Date(snapshot.date).toLocaleString(locale === 'es' ? '
   timeStyle: 'short',
   timeZone: 'America/Bogota',
 });
+
+let domain = '';
+try {
+  domain = new URL(snapshot.url).hostname.replace(/^www\./, '');
+} catch {
+  domain = 'example.com';
+}
+
+const reportUrl = `${origin}/informe/${id}`;
+const badgeImgUrl = `${origin}/badge/${domain}.svg`;
+const badgeSnippet = `<a href="${reportUrl}"><img src="${badgeImgUrl}" alt="${locale === 'es' ? 'Listo Pa Bots puntaje' : 'Listo Pa Bots score'}" /></a>`;
 
 const gaugeRadius = 80;
 const gaugeArc = Math.PI * gaugeRadius;
@@ -168,13 +180,41 @@ const labelSubtitle =
         </div>
       </section>
 
-      <footer class="site-footer">
-        <p>
-          {format(t(locale, 'informe', 'footerGeneratedBy'), { product: 'Listo Pa Bots' })} ·
-          <a href="https://orangeember.com">{t(locale, 'informe', 'footerStudio')}</a>
+      <section class="badge-section" aria-labelledby="badge-title">
+        <h2 id="badge-title" class="section-title">{t(locale, 'informe', 'badgeTitle')}</h2>
+        <p class="badge-preview">
+          <img src={badgeImgUrl} alt="Listo Pa Bots" width="200" height="56" loading="lazy" />
         </p>
-      </footer>
+        <pre class="badge-snippet" id="badge-snippet"><code>{badgeSnippet}</code></pre>
+        <button type="button" class="btn btn-secondary" id="copy-badge-snippet">
+          {t(locale, 'informe', 'badgeCopy')}
+        </button>
+      </section>
+
+      <Footer locale={locale} currentPath={canonicalPath} />
     </main>
+
+    <script is:inline>
+      (function () {
+        const btn = document.getElementById('copy-badge-snippet');
+        const snippet = document.getElementById('badge-snippet');
+        if (!btn || !snippet) return;
+        btn.addEventListener('click', function () {
+          const text = snippet.textContent || '';
+          try {
+            navigator.clipboard.writeText(text).then(function () {
+              const original = btn.textContent;
+              btn.textContent = 'Copiado';
+              setTimeout(function () {
+                btn.textContent = original;
+              }, 2000);
+            });
+          } catch {
+            window.prompt('Copia este código:', text);
+          }
+        });
+      })();
+    </script>
 
     <style is:global>
       .container {
@@ -298,6 +338,40 @@ const labelSubtitle =
 
       .breakdown-section {
         padding-bottom: var(--space-3xl);
+      }
+
+      .badge-section {
+        padding-bottom: var(--space-2xl);
+      }
+
+      .badge-preview {
+        text-align: center;
+        margin: 0 0 var(--space-md);
+      }
+
+      .badge-preview img {
+        display: inline-block;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: var(--bg-elevated);
+      }
+
+      .badge-snippet {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        overflow-x: auto;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: var(--text-muted);
+        margin: 0 0 var(--space-md);
+      }
+
+      .badge-snippet code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        white-space: pre-wrap;
+        word-break: break-all;
       }
 
       .section-title {
@@ -424,25 +498,6 @@ const labelSubtitle =
         font-size: 0.875rem;
         line-height: 1.5;
         white-space: pre-wrap;
-      }
-
-      .site-footer {
-        margin-top: var(--space-xl);
-        padding: var(--space-lg) 0 var(--space-2xl);
-        border-top: 1px solid var(--border);
-        text-align: center;
-        color: var(--text-muted);
-        font-size: 0.875rem;
-      }
-
-      .site-footer a {
-        color: var(--text);
-        text-decoration: underline;
-        text-underline-offset: 2px;
-      }
-
-      .site-footer a:hover {
-        color: var(--accent-1);
       }
 
       @media (prefers-reduced-motion: reduce) {
