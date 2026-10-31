@@ -48,6 +48,7 @@ export interface Dictionary {
     resultLabelSubtitleOk: string;
     resultLabelSubtitleParcial: string;
     resultLabelSubtitleFallo: string;
+    rateLimitedError: string;
     viewReport: string;
     copyLink: string;
     copiedLink: string;
@@ -120,6 +121,7 @@ export interface Dictionary {
     footerTerms: string;
     footerImplementation: string;
     footerOpenSource: string;
+    footerScanCount: string;
   };
   ui: {
     themeToggleLabel: string;

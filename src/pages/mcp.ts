@@ -5,11 +5,19 @@ import { createMcpHandler } from 'agents/mcp/server';
 import { z } from 'zod';
 import { scan } from '../scanner/index.js';
 import { scoreScan } from '../scoring/index.js';
+import { makeReportId } from '../lib/reports.js';
+import {
+  checkScanRateLimit,
+  recordScanAttempt,
+  incrementScanStats,
+  type RateLimitKv,
+} from '../lib/rate-limit.js';
+import { parseMcpResponse, extractTools, type McpInitializeResponse } from '../lib/mcp-parse.js';
 
-function makeId(url: URL, date: Date): string {
-  const host = url.hostname.replace(/^www\./, '');
-  const iso = date.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  return `${host}-${iso}`;
+function getReportsKv(): RateLimitKv | null {
+  const kv = env.REPORTS as { get?: (key: string) => Promise<string | null>; put?: (key: string, value: string, opts?: { expirationTtl?: number }) => Promise<void> } | undefined;
+  if (!kv?.get || !kv?.put) return null;
+  return kv as RateLimitKv;
 }
 
 function createServer() {
@@ -27,6 +35,32 @@ function createServer() {
       }),
     },
     async ({ url }, ctx) => {
+      const originalRequest = ctx.http?.req as Request | undefined;
+      const kv = getReportsKv();
+
+      if (originalRequest && kv) {
+        const limit = await checkScanRateLimit(originalRequest, kv);
+        if (!limit.allowed) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify(
+                  {
+                    error: 'rate_limited',
+                    retry_after_seconds: limit.retryAfter,
+                    message: 'Demasiados escaneos seguidos — espera unos minutos e intenta de nuevo.',
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+            isError: true,
+          };
+        }
+      }
+
       const target = new URL(url);
       const result = await scan({ url: target.toString() });
       const scored = scoreScan(result);
@@ -37,8 +71,14 @@ function createServer() {
           ? new URL(ctx.http.req.url).origin
           : `https://${target.hostname}`;
 
-      const id = makeId(target, new Date(result.date));
+      const id = makeReportId(target, new Date(result.date));
       const informeUrl = `${origin}/informe/${id}`;
+
+      if (originalRequest && kv) {
+        await recordScanAttempt(kv, originalRequest);
+        await incrementScanStats(kv);
+        await kv.put(`informe/${id}`, JSON.stringify(result));
+      }
 
       const payload = {
         url: result.url,

@@ -25,11 +25,16 @@ export function parseRobots(txt: string): AgentGroup[] {
   let current: AgentGroup | null = null;
 
   for (const raw of lines) {
-    const line = raw.replace(/#.*$/, '').trim();
-    if (!line) {
-      current = null;
+    const trimmed = raw.trim();
+    if (!trimmed || trimmed.startsWith('#')) {
+      // Only truly blank lines separate groups; comment lines do not reset current group.
+      if (!trimmed) {
+        current = null;
+      }
       continue;
     }
+    const line = trimmed.replace(/#.*$/, '');
+    if (!line) continue;
     const separator = line.indexOf(':');
     if (separator === -1) continue;
     const key = line.slice(0, separator).trim().toLowerCase();
@@ -65,7 +70,7 @@ function matches(path: string, rulePath: string): boolean {
   return normalized === rulePath || normalized.startsWith(`${rulePath}/`);
 }
 
-function evaluateAgent(groups: AgentGroup[], agent: string, targetPath: string): { allowed: boolean; matchedRule?: Rule; inherited: boolean } {
+export function evaluateAgent(groups: AgentGroup[], agent: string, targetPath: string): { allowed: boolean; matchedRule?: Rule; inherited: boolean } {
   const exact = groups.find((g) => g.agent.toLowerCase() === agent.toLowerCase());
   const wildcard = groups.find((g) => g.agent === '*');
   const rules = exact ? exact.rules : wildcard ? wildcard.rules : [];

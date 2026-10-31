@@ -1,5 +1,11 @@
 import type { ScanOutput } from '../scanner/types.js';
 
+export function makeReportId(url: URL, date: Date): string {
+  const host = url.hostname.replace(/^www\./, '');
+  const iso = date.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  return `${host}-${iso}`;
+}
+
 /**
  * Interfaz de lectura de snapshots de escaneo.
  *

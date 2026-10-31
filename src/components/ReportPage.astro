@@ -4,6 +4,7 @@ import ThemeInit from './ThemeInit.astro';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
 import { format, getLocalizedPath, getCheckExplanation, getStateLabel, t, type Locale } from '../i18n/index.js';
+import { getScanCountFromEnv } from '../lib/rate-limit.js';
 import type { ScoreResult } from '../scoring/index.js';
 import type { ScanOutput } from '../scanner/types.js';
 
@@ -19,6 +20,7 @@ const origin = Astro.url.origin;
 const canonicalPath = getLocalizedPath(`/informe/${id}`, locale);
 const canonical = `${origin}${canonicalPath}`;
 const ogImageUrl = `${origin}/og-image.png`;
+const scanCount = await getScanCountFromEnv();
 const ogTitle = format(t(locale, 'informe', 'metaTitle'), { score: result.score, label: result.label });
 const ogDescription = format(t(locale, 'informe', 'metaDescription'), {
   url: snapshot.url,
@@ -191,7 +193,7 @@ const labelSubtitle =
         </button>
       </section>
 
-      <Footer locale={locale} currentPath={canonicalPath} />
+      <Footer locale={locale} currentPath={canonicalPath} scanCount={scanCount} />
     </main>
 
     <script is:inline>

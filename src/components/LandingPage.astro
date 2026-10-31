@@ -5,6 +5,7 @@ import Header from './Header.astro';
 import Footer from './Footer.astro';
 import { implementationTiers, monitoringPlans, pricingNote } from '../data/pricing.js';
 import { getLocalizedPath, t, type Locale } from '../i18n/index.js';
+import { getScanCountFromEnv } from '../lib/rate-limit.js';
 
 interface Props {
   locale: Locale;
@@ -15,6 +16,7 @@ const origin = Astro.url.origin;
 const canonicalPath = getLocalizedPath('/', locale);
 const canonical = `${origin}${canonicalPath}`;
 const ogImage = `${origin}/og-image.png`;
+const scanCount = await getScanCountFromEnv();
 const title = t(locale, 'landing', 'metaTitle');
 const description = t(locale, 'landing', 'metaDescription');
 const ogLocale = t(locale, 'landing', 'ogLocale');
@@ -27,6 +29,7 @@ const implementationPath = getLocalizedPath('/implementacion', locale);
 const messages = {
   invalidUrlError: t(locale, 'landing', 'invalidUrlError'),
   genericError: t(locale, 'landing', 'genericError'),
+  rateLimitedError: t(locale, 'landing', 'rateLimitedError'),
   scanningTitle: t(locale, 'landing', 'scanningTitle'),
   scanningItems: t(locale, 'landing', 'scanningItems'),
   resultScoreMax: t(locale, 'landing', 'resultScoreMax'),
@@ -218,7 +221,7 @@ const messages = {
         </div>
       </section>
 
-      <Footer locale={locale} currentPath={canonicalPath} />
+      <Footer locale={locale} currentPath={canonicalPath} scanCount={scanCount} />
     </main>
 
     <style is:global>
@@ -935,6 +938,9 @@ const messages = {
           });
           const data = await response.json().catch(() => ({}));
           if (!response.ok) {
+            if (response.status === 429 && data.error === 'rate_limited') {
+              throw new Error(messages.rateLimitedError);
+            }
             throw new Error(data.error || messages.genericError);
           }
 

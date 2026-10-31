@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { scoreScan } from '../../scoring/index.js';
+import { getLatestSnapshotIdForDomain, type BadgeKv } from '../../lib/badge.js';
 
 function scoreColor(score: number): string {
   if (score >= 80) return '#34d399';
@@ -14,24 +15,18 @@ function escapeXml(text: string): string {
 
 async function getLatestScore(domain: string): Promise<{ score: number | null; reportUrl: string | null }> {
   try {
-    const kv = env.REPORTS as {
-      list?: (opts: { prefix: string }) => Promise<{ keys: { name: string }[] }>;
-      get?: (key: string) => Promise<string | null>;
-    } | undefined;
-    if (!kv?.list || !kv?.get) return { score: null, reportUrl: null };
+    const kv = env.REPORTS as BadgeKv | undefined;
+    if (!kv) return { score: null, reportUrl: null };
 
-    const listed = await kv.list({ prefix: `informe/${domain}-` });
-    if (!listed.keys || listed.keys.length === 0) return { score: null, reportUrl: null };
+    const { key, id } = await getLatestSnapshotIdForDomain(kv, domain);
+    if (!key || !id) return { score: null, reportUrl: null };
 
-    const sorted = [...listed.keys].sort((a, b) => b.name.localeCompare(a.name));
-    const latestKey = sorted[0].name;
-    const raw = await kv.get(latestKey);
+    const raw = await kv.get(key);
     if (!raw) return { score: null, reportUrl: null };
 
     const snapshot = JSON.parse(raw) as Parameters<typeof scoreScan>[0];
     const scored = scoreScan(snapshot);
-    const reportId = latestKey.replace(/^informe\//, '');
-    return { score: scored.score, reportUrl: `/informe/${reportId}` };
+    return { score: scored.score, reportUrl: `/informe/${id}` };
   } catch {
     return { score: null, reportUrl: null };
   }

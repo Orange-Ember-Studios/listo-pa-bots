@@ -1,15 +1,17 @@
 ---
 import type { Locale } from '../i18n/index.js';
-import { getLocalizedPath, t } from '../i18n/index.js';
+import { format, getLocalizedPath, t } from '../i18n/index.js';
 import LanguageSelector from './LanguageSelector.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
   locale: Locale;
   currentPath: string;
+  scanCount?: number;
 }
 
-const { locale, currentPath } = Astro.props;
+const { locale, currentPath, scanCount = 0 } = Astro.props;
+const formattedCount = scanCount.toLocaleString(locale === 'es' ? 'es-CO' : 'en-US');
 ---
 
 <footer class="site-footer">
@@ -24,6 +26,8 @@ const { locale, currentPath } = Astro.props;
       <a href={getLocalizedPath('/terminos', locale)}>{t(locale, 'common', 'footerTerms')}</a>
       <span class="footer-sep">·</span>
       <a href="https://github.com/Orange-Ember-Studios/listo-pa-bots">{t(locale, 'common', 'footerOpenSource')}</a>
+      <span class="footer-sep">·</span>
+      <span class="footer-counter">{format(t(locale, 'common', 'footerScanCount'), { count: formattedCount })}</span>
     </div>
     <div class="footer-controls">
       <LanguageSelector locale={locale} currentPath={currentPath} />
@@ -82,6 +86,11 @@ const { locale, currentPath } = Astro.props;
 
   .footer-sep {
     opacity: 0.5;
+  }
+
+  .footer-counter {
+    color: var(--accent-secondary);
+    font-weight: 600;
   }
 
   .footer-controls {

@@ -4,16 +4,25 @@ import { format, t, type Locale } from '../../i18n/index.js';
 import { scan } from '../../scanner/index.js';
 import { normalizeUrl } from '../../scanner/types.js';
 import { scoreScan } from '../../scoring/index.js';
+import { makeReportId } from '../../lib/reports.js';
+import {
+  checkScanRateLimit,
+  incrementScanStats,
+  recordScanAttempt,
+  type RateLimitKv,
+} from '../../lib/rate-limit.js';
 
-function makeId(url: URL, date: Date): string {
-  const host = url.hostname.replace(/^www\./, '');
-  const iso = date.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  return `${host}-${iso}`;
-}
+export const prerender = false;
 
 function informeUrl(origin: string, id: string, locale: Locale): string {
   const prefix = locale === 'en' ? '/en' : '';
   return `${origin}${prefix}/informe/${id}`;
+}
+
+function getReportsKv(): RateLimitKv | null {
+  const kv = env.REPORTS as { get?: (key: string) => Promise<string | null>; put?: (key: string, value: string, opts?: { expirationTtl?: number }) => Promise<void> } | undefined;
+  if (!kv?.get || !kv?.put) return null;
+  return kv as RateLimitKv;
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -49,14 +58,36 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
+  const kv = getReportsKv();
+  if (kv) {
+    const limit = await checkScanRateLimit(request, kv);
+    if (!limit.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: 'rate_limited',
+          retry_after_seconds: limit.retryAfter,
+          message: t(locale, 'landing', 'rateLimitedError'),
+        }),
+        {
+          status: 429,
+          headers: {
+            'content-type': 'application/json',
+            'retry-after': String(limit.retryAfter),
+          },
+        }
+      );
+    }
+  }
+
   try {
     const snapshot = await scan({ url: target.toString() });
     const scored = scoreScan(snapshot);
-    const id = makeId(target, new Date(snapshot.date));
+    const id = makeReportId(target, new Date(snapshot.date));
     const key = `informe/${id}`;
 
-    const kv = env.REPORTS as { put?: (key: string, value: string) => Promise<void> } | undefined;
-    if (kv?.put) {
+    if (kv) {
+      await recordScanAttempt(kv, request);
+      await incrementScanStats(kv);
       await kv.put(key, JSON.stringify(snapshot));
     }
 

@@ -3,6 +3,7 @@ import { env } from 'cloudflare:workers';
 import { normalizeUrl } from '../../scanner/types.js';
 import { scoreScan } from '../../scoring/index.js';
 import { t, type Locale } from '../../i18n/index.js';
+import { getClientIP } from '../../lib/rate-limit.js';
 
 interface LeadRecord {
   id: string;
@@ -11,14 +12,6 @@ interface LeadRecord {
   email: string;
   plan: string;
   score_hint: number | null;
-}
-
-function getClientIP(request: Request): string {
-  const cf = request.headers.get('cf-connecting-ip');
-  if (cf) return cf;
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0].trim();
-  return 'unknown';
 }
 
 function isValidEmail(value: string): boolean {

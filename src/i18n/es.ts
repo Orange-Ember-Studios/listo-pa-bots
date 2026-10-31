@@ -26,6 +26,7 @@ export const es: Dictionary = {
     resultLabelSubtitleOk: 'listo para los agentes de IA',
     resultLabelSubtitleParcial: 'a medio camino de los agentes de IA',
     resultLabelSubtitleFallo: 'invisible para los agentes de IA',
+    rateLimitedError: 'Demasiados escaneos seguidos — espera unos minutos e intenta de nuevo.',
     viewReport: 'Ver el informe completo',
     copyLink: 'Copiar enlace',
     copiedLink: 'Enlace copiado',
@@ -215,6 +216,7 @@ export const es: Dictionary = {
     footerTerms: 'Términos',
     footerImplementation: 'Implementación',
     footerOpenSource: 'Código abierto',
+    footerScanCount: '{count} escaneos realizados',
   },
   ui: {
     themeToggleLabel: 'Cambiar entre tema claro y oscuro',

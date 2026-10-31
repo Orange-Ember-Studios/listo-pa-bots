@@ -26,6 +26,7 @@ export const en: Dictionary = {
     resultLabelSubtitleOk: 'ready for AI agents',
     resultLabelSubtitleParcial: 'halfway to AI agents',
     resultLabelSubtitleFallo: 'invisible to AI agents',
+    rateLimitedError: 'Too many scans in a row — wait a few minutes and try again.',
     viewReport: 'View full report',
     copyLink: 'Copy link',
     copiedLink: 'Link copied',
@@ -215,6 +216,7 @@ export const en: Dictionary = {
     footerTerms: 'Terms',
     footerImplementation: 'Implementation',
     footerOpenSource: 'Open source',
+    footerScanCount: '{count} scans performed',
   },
   ui: {
     themeToggleLabel: 'Toggle between light and dark theme',
