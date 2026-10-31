@@ -66,6 +66,7 @@
   --gauge-track: rgba(0, 0, 0, 0.10);
 
   --accent-glow: rgba(255, 90, 31, 0.22);
+  --accent-secondary: #96690f;
   --accent-secondary-glow: rgba(245, 166, 35, 0.18);
 
   --state-ok: #059669;
