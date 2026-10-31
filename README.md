@@ -23,6 +23,38 @@ npm run scan -- https://tusitio.com
 
 Ejemplo real guardado en [`docs/ejemplo-scan.json`](./docs/ejemplo-scan.json).
 
+## Cómo generar un informe público
+
+```bash
+npm run report -- https://tusitio.com
+```
+
+Esto ejecuta el escaneo, guarda el snapshot en `public/reports/<id>.json` e imprime la URL local del informe, por ejemplo:
+
+```text
+Informe: http://localhost:8788/informe/orangeember.com-2026-10-31T16-09-39
+```
+
+La página `/informe/[id]` lee el snapshot desde disco (local) y renderiza el puntaje, la etiqueta y el desglose. En Cloudflare Workers la misma interfaz se conectará a KV sin cambiar la UI.
+
+## Ponderación del puntaje
+
+El puntaje 0-100 es determinista y otorga crédito proporcional por estados `parcial`:
+
+| Check | Peso |
+|-------|------|
+| robots.txt segmentado | 35 |
+| SSR / contenido estático | 25 |
+| llms.txt | 15 |
+| headers HTTP | 15 |
+| sitemap.xml | 10 |
+
+Etiquetas por rango:
+
+- **80-100**: Listo Pa Bots
+- **50-79**: A medias
+- **0-49**: Invisible Pa Bots
+
 ## Estructura
 
 ```text
