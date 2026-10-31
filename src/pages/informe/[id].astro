@@ -1,0 +1,132 @@
+---
+export const prerender = false;
+
+import { getReportById } from '../../lib/reports.js';
+import { scoreScan } from '../../scoring/index.js';
+
+const id = Astro.params.id;
+if (!id) {
+  return new Response('Informe no encontrado', { status: 404 });
+}
+
+const snapshot = await getReportById(id, Astro.url.origin);
+if (!snapshot) {
+  return new Response('Informe no encontrado', { status: 404 });
+}
+
+const result = scoreScan(snapshot);
+const pageUrl = `${Astro.url.origin}/informe/${id}`;
+const ogImageUrl = `${Astro.url.origin}/og-image.png`;
+const ogTitle = `${result.score}/100 · ${result.label} — Listo Pa Bots`;
+const ogDescription = `Puntaje de agentic-readiness para ${snapshot.url}: ${result.score} de 100 (${result.label}). Revisa el desglose por checks.`;
+const formattedDate = new Date(snapshot.date).toLocaleString('es-CO', {
+  dateStyle: 'long',
+  timeStyle: 'short',
+  timeZone: 'America/Bogota',
+});
+
+const stateLabel: Record<string, string> = {
+  ok: 'Bien',
+  parcial: 'Parcial',
+  fallo: 'Falta',
+};
+
+const stateColor: Record<string, string> = {
+  ok: '#166534',
+  parcial: '#92400e',
+  fallo: '#991b1b',
+};
+
+const stateBg: Record<string, string> = {
+  ok: '#dcfce7',
+  parcial: '#fef3c7',
+  fallo: '#fee2e2',
+};
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{ogTitle}</title>
+    <meta name="description" content={ogDescription} />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_CO" />
+  </head>
+  <body>
+    <main
+      style="max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.5; color: #1f2937;"
+    >
+      <header style="margin-bottom: 2rem;">
+        <a href="/" style="color: #2563eb; text-decoration: none; font-weight: 500;">← Listo Pa Bots</a>
+      </header>
+
+      <section
+        style="text-align: center; padding: 2rem; border-radius: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; margin-bottom: 2rem;"
+      >
+        <div
+          style="font-size: 5rem; font-weight: 800; line-height: 1; color: #0f172a;"
+        >
+          {result.score}
+          <span style="font-size: 1.75rem; font-weight: 600; color: #64748b;">/ 100</span>
+        </div>
+        <div
+          style="margin-top: 0.75rem; font-size: 1.5rem; font-weight: 700; color: #0f172a;"
+        >
+          {result.label}
+        </div>
+        <p style="margin-top: 0.5rem; color: #475569;">
+          {snapshot.url}
+        </p>
+        <p style="margin-top: 0.25rem; font-size: 0.875rem; color: #64748b;">
+          Escaneado el {formattedDate}
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 1.25rem; margin-bottom: 1rem; color: #0f172a;">Desglose por check</h2>
+        <div style="display: grid; gap: 1rem;">
+          {
+            result.breakdown.map((item) => (
+              <article
+                style={`padding: 1rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: #ffffff;`}
+              >
+                <div
+                  style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;"
+                >
+                  <div style="font-weight: 600; color: #0f172a;">{item.name}</div>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span
+                      style={`display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; color: ${stateColor[item.state]}; background: ${stateBg[item.state]};`}
+                    >
+                      {stateLabel[item.state]}
+                    </span>
+                    <span style="font-weight: 700; color: #0f172a;">
+                      {Math.round(item.earned)} / {item.max}
+                    </span>
+                  </div>
+                </div>
+                <p style="margin: 0.75rem 0 0; color: #475569; font-size: 0.9375rem;">
+                  {item.detail}
+                </p>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.875rem; text-align: center;">
+        Informe generado por Listo Pa Bots
+      </footer>
+    </main>
+  </body>
+</html>
