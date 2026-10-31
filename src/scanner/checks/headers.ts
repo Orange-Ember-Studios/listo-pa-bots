@@ -18,16 +18,16 @@ export const checkHeaders: CheckFn = async (ctx) => {
   if (isBlocked) {
     return {
       id: 'headers',
-      estado: 'fallo',
-      detalle: 'El header x-robots-tag bloquea indexación o rastreo',
-      evidencia: { headers: relevant, advertencia: 'x-robots-tag restringe agentes' },
+      state: 'fallo',
+      detail: 'El header x-robots-tag bloquea indexación o rastreo',
+      evidence: { headers: relevant, warning: 'x-robots-tag restringe agentes' },
     };
   }
 
   return {
     id: 'headers',
-    estado: 'ok',
-    detalle: 'Headers HTTP relevantes revisados; no hay bloqueos por x-robots-tag',
-    evidencia: { headers: relevant },
+    state: 'ok',
+    detail: 'Headers HTTP relevantes revisados; no hay bloqueos por x-robots-tag',
+    evidence: { headers: relevant },
   };
 };

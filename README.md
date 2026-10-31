@@ -46,6 +46,14 @@ npm run build
 
 Para publicar después se usará `wrangler deploy` (requiere autenticación).
 
+## Convención de JSON
+
+Todos los JSON del proyecto usan **claves en inglés** y **valores en español**. Esto aplica a la salida del escáner, los tipos TypeScript, la API y cualquier archivo JSON presente o futuro.
+
+- Las claves (nombres de propiedades) siempre están en inglés: `state`, `detail`, `evidence`, `agents`, `rule`, `inherited`, `date`, etc.
+- Los valores legibles por humanos se mantienen en español: textos de producto, mensajes, detalles y advertencias.
+- Los estados de enumeración (`ok`, `parcial`, `fallo`) son valores y se quedan en español.
+
 ## Licencia
 
 MIT

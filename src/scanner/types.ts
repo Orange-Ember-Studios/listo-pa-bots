@@ -2,9 +2,9 @@ export type CheckState = 'ok' | 'parcial' | 'fallo';
 
 export interface CheckResult {
   id: string;
-  estado: CheckState;
-  detalle: string;
-  evidencia: Record<string, unknown>;
+  state: CheckState;
+  detail: string;
+  evidence: Record<string, unknown>;
 }
 
 export interface ScanInput {
@@ -14,7 +14,7 @@ export interface ScanInput {
 
 export interface ScanOutput {
   url: string;
-  fecha: string;
+  date: string;
   checks: CheckResult[];
 }
 

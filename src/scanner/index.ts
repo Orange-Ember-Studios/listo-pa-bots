@@ -28,9 +28,9 @@ export async function scan(input: ScanInput): Promise<ScanOutput> {
       } catch (err) {
         return {
           id: check.name || 'unknown',
-          estado: 'fallo' as const,
-          detalle: `El check falló con error: ${(err as Error).message}`,
-          evidencia: { error: (err as Error).message },
+          state: 'fallo' as const,
+          detail: `El check falló con error: ${(err as Error).message}`,
+          evidence: { error: (err as Error).message },
         };
       }
     })
@@ -38,7 +38,7 @@ export async function scan(input: ScanInput): Promise<ScanOutput> {
 
   return {
     url: target.toString(),
-    fecha: new Date().toISOString(),
+    date: new Date().toISOString(),
     checks: results,
   };
 }

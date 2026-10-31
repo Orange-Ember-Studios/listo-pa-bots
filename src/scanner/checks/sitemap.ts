@@ -56,9 +56,9 @@ export const checkSitemap: CheckFn = async (ctx) => {
   if (!checkedText) {
     return {
       id: 'sitemap',
-      estado: 'fallo',
-      detalle: 'No se encontró un sitemap.xml válido',
-      evidencia: { ubicacionesBuscadas: COMMON_SITEMAP_PATHS },
+      state: 'fallo',
+      detail: 'No se encontró un sitemap.xml válido',
+      evidence: { searchedLocations: COMMON_SITEMAP_PATHS },
     };
   }
 
@@ -66,36 +66,36 @@ export const checkSitemap: CheckFn = async (ctx) => {
   if (!parsed.valid) {
     return {
       id: 'sitemap',
-      estado: 'fallo',
-      detalle: 'El sitemap encontrado no tiene formato XML válido',
-      evidencia: { url: checkedUrl, status: checkedStatus, parseError: parsed.error },
+      state: 'fallo',
+      detail: 'El sitemap encontrado no tiene formato XML válido',
+      evidence: { url: checkedUrl, status: checkedStatus, parseError: parsed.error },
     };
   }
 
   const sample = parsed.urls.slice(0, 5);
   const probes = await Promise.all(sample.map((url) => probeEntry(url)));
-  const fallos = probes.filter((p) => !p.status || p.status >= 400).length;
+  const failures = probes.filter((p) => !p.status || p.status >= 400).length;
 
-  let estado: CheckState;
-  let detalle: string;
-  if (fallos === 0) {
-    estado = 'ok';
-    detalle = `Sitemap válido con ${parsed.urls.length} URL(s); ${sample.length} entrada(s) de muestra responden correctamente`;
+  let state: CheckState;
+  let detail: string;
+  if (failures === 0) {
+    state = 'ok';
+    detail = `Sitemap válido con ${parsed.urls.length} URL(s); ${sample.length} entrada(s) de muestra responden correctamente`;
   } else {
-    estado = 'parcial';
-    detalle = `Sitemap válido con ${parsed.urls.length} URL(s), pero ${fallos} entrada(s) de muestra fallan`;
+    state = 'parcial';
+    detail = `Sitemap válido con ${parsed.urls.length} URL(s), pero ${failures} entrada(s) de muestra fallan`;
   }
 
   return {
     id: 'sitemap',
-    estado,
-    detalle,
-    evidencia: {
+    state,
+    detail,
+    evidence: {
       url: checkedUrl,
       status: checkedStatus,
       totalUrls: parsed.urls.length,
-      muestra: probes,
-      primerasUrls: parsed.urls.slice(0, 10),
+      sample: probes,
+      firstUrls: parsed.urls.slice(0, 10),
     },
   };
 };

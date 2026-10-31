@@ -111,71 +111,71 @@ export const checkRobots: CheckFn = async (ctx) => {
   } catch (err) {
     return {
       id: 'robots-txt',
-      estado: 'fallo',
-      detalle: 'No se pudo obtener robots.txt',
-      evidencia: { url: robotsUrl, error: (err as Error).message },
+      state: 'fallo',
+      detail: 'No se pudo obtener robots.txt',
+      evidence: { url: robotsUrl, error: (err as Error).message },
     };
   }
 
   if (status !== 200 || !txt.trim()) {
     return {
       id: 'robots-txt',
-      estado: 'fallo',
-      detalle: status === 200 ? 'robots.txt está vacío' : `robots.txt respondió HTTP ${status}`,
-      evidencia: { url: robotsUrl, status },
+      state: 'fallo',
+      detail: status === 200 ? 'robots.txt está vacío' : `robots.txt respondió HTTP ${status}`,
+      evidence: { url: robotsUrl, status },
     };
   }
 
   const groups = parseRobots(txt);
-  const perAgent: Record<string, { estado: CheckState; detalle: string; regla?: string; heredado: boolean }> = {};
+  const perAgent: Record<string, { state: CheckState; detail: string; rule?: string; inherited: boolean }> = {};
 
   for (const agent of AGENTS) {
     const result = evaluateAgent(groups, agent, ctx.target.pathname || '/');
     if (result.allowed) {
       perAgent[agent] = {
-        estado: 'ok',
-        detalle: result.matchedRule
+        state: 'ok',
+        detail: result.matchedRule
           ? `${agent} puede acceder a ${ctx.target.pathname || '/'} (${result.matchedRule.type}:${result.matchedRule.path})`
           : `${agent} no tiene reglas restrictivas`,
-        regla: result.matchedRule ? `${result.matchedRule.type}:${result.matchedRule.path}` : undefined,
-        heredado: result.inherited,
+        rule: result.matchedRule ? `${result.matchedRule.type}:${result.matchedRule.path}` : undefined,
+        inherited: result.inherited,
       };
     } else {
       const isTotal = result.matchedRule?.path === '/' || result.matchedRule?.path === '';
       perAgent[agent] = {
-        estado: isTotal ? 'fallo' : 'parcial',
-        detalle: `${agent} ${isTotal ? 'está bloqueado totalmente' : 'tiene acceso parcial'} (${result.matchedRule?.type}:${result.matchedRule?.path})`,
-        regla: `${result.matchedRule?.type}:${result.matchedRule?.path}`,
-        heredado: result.inherited,
+        state: isTotal ? 'fallo' : 'parcial',
+        detail: `${agent} ${isTotal ? 'está bloqueado totalmente' : 'tiene acceso parcial'} (${result.matchedRule?.type}:${result.matchedRule?.path})`,
+        rule: `${result.matchedRule?.type}:${result.matchedRule?.path}`,
+        inherited: result.inherited,
       };
     }
   }
 
-  const fallos = Object.values(perAgent).filter((a) => a.estado === 'fallo').length;
-  const parciales = Object.values(perAgent).filter((a) => a.estado === 'parcial').length;
-  let estado: CheckState;
-  let detalle: string;
-  if (fallos > 0) {
-    estado = 'fallo';
-    detalle = `${fallos} agente(s) de IA están bloqueados totalmente`;
-  } else if (parciales > 0) {
-    estado = 'parcial';
-    detalle = `${parciales} agente(s) de IA tienen acceso parcial`;
+  const failures = Object.values(perAgent).filter((a) => a.state === 'fallo').length;
+  const partials = Object.values(perAgent).filter((a) => a.state === 'parcial').length;
+  let state: CheckState;
+  let detail: string;
+  if (failures > 0) {
+    state = 'fallo';
+    detail = `${failures} agente(s) de IA están bloqueados totalmente`;
+  } else if (partials > 0) {
+    state = 'parcial';
+    detail = `${partials} agente(s) de IA tienen acceso parcial`;
   } else {
-    estado = 'ok';
-    detalle = 'Todos los agentes de IA relevantes pueden acceder al sitio';
+    state = 'ok';
+    detail = 'Todos los agentes de IA relevantes pueden acceder al sitio';
   }
 
   return {
     id: 'robots-txt',
-    estado,
-    detalle,
-    evidencia: {
+    state,
+    detail,
+    evidence: {
       url: robotsUrl,
       status,
-      agentes: perAgent,
-      gruposEncontrados: groups.map((g) => g.agent),
-      lineas: txt.split(/\r?\n/).filter((l) => l.trim() && !l.trim().startsWith('#')).length,
+      agents: perAgent,
+      foundGroups: groups.map((g) => g.agent),
+      lines: txt.split(/\r?\n/).filter((l) => l.trim() && !l.trim().startsWith('#')).length,
     },
   };
 };

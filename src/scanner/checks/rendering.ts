@@ -36,28 +36,28 @@ export const checkRendering: CheckFn = async (ctx) => {
   const body = bodyMatch ? bodyMatch[1] : html;
   const bodyText = countVisibleText(body);
 
-  let estado: CheckState;
-  let detalle: string;
+  let state: CheckState;
+  let detail: string;
 
   if (appShellDetected && bodyText < 300) {
-    estado = 'fallo';
-    detalle = 'El home parece ser una aplicación de cliente: contenedor vacío y poco texto visible';
+    state = 'fallo';
+    detail = 'El home parece ser una aplicación de cliente: contenedor vacío y poco texto visible';
   } else if (visibleWords < 50 && scriptTags > 5) {
-    estado = 'fallo';
-    detalle = 'El HTML inicial tiene muy poco contenido y muchos scripts; los agentes probablemente no vean información útil';
+    state = 'fallo';
+    detail = 'El HTML inicial tiene muy poco contenido y muchos scripts; los agentes probablemente no vean información útil';
   } else if (visibleWords < 150 || bodyText < 500) {
-    estado = 'parcial';
-    detalle = 'El home tiene algo de contenido estático, pero podría depender del navegador para mostrar información clave';
+    state = 'parcial';
+    detail = 'El home tiene algo de contenido estático, pero podría depender del navegador para mostrar información clave';
   } else {
-    estado = 'ok';
-    detalle = 'El home entrega contenido estático legible sin depender exclusivamente del cliente';
+    state = 'ok';
+    detail = 'El home entrega contenido estático legible sin depender exclusivamente del cliente';
   }
 
   return {
     id: 'rendering',
-    estado,
-    detalle,
-    evidencia: {
+    state,
+    detail,
+    evidence: {
       htmlSizeBytes: htmlSize,
       visibleTextChars: visibleText,
       visibleWords,
