@@ -25,7 +25,7 @@ async function main() {
   const snapshotPath = `public/reports/${id}.json`;
   await writeFile(snapshotPath, JSON.stringify(scanResult, null, 2));
 
-  const reportUrl = `http://localhost:8788/informe/${id}`;
+  const reportUrl = `http://localhost:4321/informe/${id}`;
 
   console.log(`Snapshot guardado: ${snapshotPath}`);
   console.log(`Informe: ${reportUrl}`);

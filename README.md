@@ -32,7 +32,7 @@ npm run report -- https://tusitio.com
 Esto ejecuta el escaneo, guarda el snapshot en `public/reports/<id>.json` e imprime la URL local del informe, por ejemplo:
 
 ```text
-Informe: http://localhost:8788/informe/orangeember.com-2026-10-31T16-09-39
+Informe: http://localhost:4321/informe/orangeember.com-2026-10-31T16-09-39
 ```
 
 La página `/informe/[id]` lee el snapshot desde disco (local) y renderiza el puntaje, la etiqueta y el desglose. En Cloudflare Workers la misma interfaz se conectará a KV sin cambiar la UI.
