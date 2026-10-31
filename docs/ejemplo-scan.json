@@ -1,47 +1,47 @@
 {
   "url": "https://orangeember.com/",
-  "fecha": "2026-10-31T15:53:51.112Z",
+  "date": "2026-10-31T16:09:39.178Z",
   "checks": [
     {
       "id": "robots-txt",
-      "estado": "ok",
-      "detalle": "Todos los agentes de IA relevantes pueden acceder al sitio",
-      "evidencia": {
+      "state": "ok",
+      "detail": "Todos los agentes de IA relevantes pueden acceder al sitio",
+      "evidence": {
         "url": "https://orangeember.com/robots.txt",
         "status": 200,
-        "agentes": {
+        "agents": {
           "GPTBot": {
-            "estado": "ok",
-            "detalle": "GPTBot puede acceder a / (allow:/)",
-            "regla": "allow:/",
-            "heredado": false
+            "state": "ok",
+            "detail": "GPTBot puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": false
           },
           "ChatGPT-User": {
-            "estado": "ok",
-            "detalle": "ChatGPT-User puede acceder a / (allow:/)",
-            "regla": "allow:/",
-            "heredado": true
+            "state": "ok",
+            "detail": "ChatGPT-User puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": true
           },
           "ClaudeBot": {
-            "estado": "ok",
-            "detalle": "ClaudeBot puede acceder a / (allow:/)",
-            "regla": "allow:/",
-            "heredado": true
+            "state": "ok",
+            "detail": "ClaudeBot puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": true
           },
           "PerplexityBot": {
-            "estado": "ok",
-            "detalle": "PerplexityBot puede acceder a / (allow:/)",
-            "regla": "allow:/",
-            "heredado": true
+            "state": "ok",
+            "detail": "PerplexityBot puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": true
           },
           "Google-Extended": {
-            "estado": "ok",
-            "detalle": "Google-Extended puede acceder a / (allow:/)",
-            "regla": "allow:/",
-            "heredado": false
+            "state": "ok",
+            "detail": "Google-Extended puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": false
           }
         },
-        "gruposEncontrados": [
+        "foundGroups": [
           "*",
           "GPTBot",
           "CCBot",
@@ -49,48 +49,48 @@
           "anthropic-ai",
           "Claude-Web"
         ],
-        "lineas": 19
+        "lines": 19
       }
     },
     {
       "id": "llms-txt",
-      "estado": "fallo",
-      "detalle": "No se encontró llms.txt en ninguna ubicación común",
-      "evidencia": {
-        "variantesProbados": [
+      "state": "fallo",
+      "detail": "No se encontró llms.txt en ninguna ubicación común",
+      "evidence": {
+        "variantsTested": [
           {
             "url": "https://orangeember.com/llms.txt",
             "status": 404,
-            "encontrado": false,
-            "tamano": 0
+            "found": false,
+            "size": 0
           },
           {
             "url": "https://orangeember.com/LLMs.txt",
             "status": 404,
-            "encontrado": false,
-            "tamano": 0
+            "found": false,
+            "size": 0
           },
           {
             "url": "https://orangeember.com/.well-known/llms.txt",
             "status": 404,
-            "encontrado": false,
-            "tamano": 0
+            "found": false,
+            "size": 0
           },
           {
             "url": "https://orangeember.com/llm.txt",
             "status": 404,
-            "encontrado": false,
-            "tamano": 0
+            "found": false,
+            "size": 0
           }
         ]
       }
     },
     {
       "id": "sitemap",
-      "estado": "fallo",
-      "detalle": "No se encontró un sitemap.xml válido",
-      "evidencia": {
-        "ubicacionesBuscadas": [
+      "state": "fallo",
+      "detail": "No se encontró un sitemap.xml válido",
+      "evidence": {
+        "searchedLocations": [
           "/sitemap.xml",
           "/sitemap_index.xml",
           "/sitemaps.xml"
@@ -99,9 +99,9 @@
     },
     {
       "id": "headers",
-      "estado": "ok",
-      "detalle": "Headers HTTP relevantes revisados; no hay bloqueos por x-robots-tag",
-      "evidencia": {
+      "state": "ok",
+      "detail": "Headers HTTP relevantes revisados; no hay bloqueos por x-robots-tag",
+      "evidence": {
         "headers": {
           "content-type": "text/html"
         }
@@ -109,9 +109,9 @@
     },
     {
       "id": "rendering",
-      "estado": "ok",
-      "detalle": "El home entrega contenido estático legible sin depender exclusivamente del cliente",
-      "evidencia": {
+      "state": "ok",
+      "detail": "El home entrega contenido estático legible sin depender exclusivamente del cliente",
+      "evidence": {
         "htmlSizeBytes": 58315,
         "visibleTextChars": 2279,
         "visibleWords": 441,
