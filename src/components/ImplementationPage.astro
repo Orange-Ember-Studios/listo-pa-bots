@@ -3,7 +3,7 @@ import '../styles/tokens.css';
 import ThemeInit from './ThemeInit.astro';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
-import { implementationTiers, monitoringPlans, pricingNote } from '../data/pricing.js';
+import { implementationTiers, monitoringPlans, pricingNote, formatPrice } from '../data/pricing.js';
 import { getLocalizedPath, t, type Locale } from '../i18n/index.js';
 
 interface Props {
@@ -92,7 +92,7 @@ const messages = {
             implementationTiers.map((tier) => (
               <article class="pricing-card">
                 <h3>{tier.name[locale]}</h3>
-                <p class="pricing-price">{tier.price[locale]}</p>
+                <p class="pricing-price">{formatPrice(tier.price, locale)}</p>
                 <p class="pricing-description">{tier.description[locale]}</p>
                 <p class="pricing-includes">{tier.includes[locale]}</p>
                 <ul>
@@ -115,7 +115,7 @@ const messages = {
               monitoringPlans.map((plan) => (
                 <article class="pricing-card monitoring-card">
                   <h4>{plan.name[locale]}</h4>
-                  <p class="pricing-price">{plan.price[locale]}</p>
+                  <p class="pricing-price">{formatPrice(plan.price, locale)}</p>
                   <p class="pricing-description">{plan.description[locale]}</p>
                   <ul>
                     {plan.features.map((item) => (
