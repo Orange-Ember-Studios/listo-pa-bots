@@ -1,0 +1,233 @@
+{
+  "url": "https://orangeember.com/",
+  "date": "2026-10-31T19:28:28.650Z",
+  "checks": [
+    {
+      "id": "robots-txt",
+      "state": "ok",
+      "detail": "Todos los agentes de IA relevantes pueden acceder al sitio",
+      "evidence": {
+        "url": "https://orangeember.com/robots.txt",
+        "status": 200,
+        "agents": {
+          "GPTBot": {
+            "state": "ok",
+            "detail": "GPTBot puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": false
+          },
+          "ChatGPT-User": {
+            "state": "ok",
+            "detail": "ChatGPT-User puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": true
+          },
+          "ClaudeBot": {
+            "state": "ok",
+            "detail": "ClaudeBot puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": true
+          },
+          "PerplexityBot": {
+            "state": "ok",
+            "detail": "PerplexityBot puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": true
+          },
+          "Google-Extended": {
+            "state": "ok",
+            "detail": "Google-Extended puede acceder a / (allow:/)",
+            "rule": "allow:/",
+            "inherited": false
+          }
+        },
+        "foundGroups": [
+          "*",
+          "GPTBot",
+          "CCBot",
+          "Google-Extended",
+          "anthropic-ai",
+          "Claude-Web"
+        ],
+        "lines": 19
+      }
+    },
+    {
+      "id": "llms-txt",
+      "state": "fallo",
+      "detail": "No se encontró llms.txt en ninguna ubicación común",
+      "evidence": {
+        "variantsTested": [
+          {
+            "url": "https://orangeember.com/llms.txt",
+            "status": 404,
+            "found": false,
+            "size": 0
+          },
+          {
+            "url": "https://orangeember.com/LLMs.txt",
+            "status": 404,
+            "found": false,
+            "size": 0
+          },
+          {
+            "url": "https://orangeember.com/.well-known/llms.txt",
+            "status": 404,
+            "found": false,
+            "size": 0
+          },
+          {
+            "url": "https://orangeember.com/llm.txt",
+            "status": 404,
+            "found": false,
+            "size": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "sitemap",
+      "state": "fallo",
+      "detail": "No se encontró un sitemap.xml válido",
+      "evidence": {
+        "searchedLocations": [
+          "/sitemap.xml",
+          "/sitemap_index.xml",
+          "/sitemaps.xml"
+        ]
+      }
+    },
+    {
+      "id": "headers",
+      "state": "ok",
+      "detail": "Headers HTTP relevantes revisados; no hay bloqueos por x-robots-tag",
+      "evidence": {
+        "headers": {
+          "content-type": "text/html"
+        }
+      }
+    },
+    {
+      "id": "rendering",
+      "state": "ok",
+      "detail": "El home entrega contenido estático legible sin depender exclusivamente del cliente",
+      "evidence": {
+        "htmlSizeBytes": 58315,
+        "visibleTextChars": 2279,
+        "visibleWords": 441,
+        "scriptTags": 9,
+        "appShellDetected": false,
+        "bodyTextChars": 2239
+      }
+    },
+    {
+      "id": "ai-manifest",
+      "state": "fallo",
+      "detail": "No se encontró ai-agent.json en /.well-known/ ni en raíz",
+      "evidence": {
+        "probes": [
+          {
+            "url": "https://orangeember.com/.well-known/ai-agent.json",
+            "status": 404,
+            "contentType": "text/html",
+            "size": 5224,
+            "parseable": false
+          },
+          {
+            "url": "https://orangeember.com/ai-agent.json",
+            "status": 404,
+            "contentType": "text/html",
+            "size": 6206,
+            "parseable": false
+          }
+        ],
+        "checkedLocations": [
+          "/.well-known/ai-agent.json",
+          "/ai-agent.json"
+        ]
+      }
+    },
+    {
+      "id": "schema-action",
+      "state": "parcial",
+      "detail": "Se encontró JSON-LD (Organization, WebSite, BreadcrumbList, ListItem) pero sin acción operativa",
+      "evidence": {
+        "jsonLdBlocks": 3,
+        "schemaTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "ListItem"
+        ],
+        "hasPotentialAction": false,
+        "hasAction": false
+      }
+    },
+    {
+      "id": "accessibility",
+      "state": "ok",
+      "detail": "Accesibilidad básica favorable (90/100): lang, alt en imágenes, landmarks y jerarquía de encabezados presentes",
+      "evidence": {
+        "lang": true,
+        "imgTotal": 4,
+        "imgWithAlt": 4,
+        "altCoverage": 100,
+        "landmarks": [
+          "<nav>",
+          "<footer>",
+          "<section>",
+          "<article>",
+          "aria-label"
+        ],
+        "headingCounts": {
+          "h1": 1,
+          "h2": 4,
+          "h3": 6,
+          "h4": 0,
+          "h5": 0,
+          "h6": 0
+        },
+        "accessibilityScore": 90
+      }
+    },
+    {
+      "id": "mcp-operability",
+      "state": "fallo",
+      "detail": "Ningún endpoint candidato respondió como MCP con JSON-RPC válido",
+      "evidence": {
+        "endpointsTested": [
+          {
+            "url": "https://orangeember.com/mcp",
+            "method": "GET",
+            "status": 404,
+            "isMcp": false
+          },
+          {
+            "url": "https://orangeember.com/mcp",
+            "method": "POST",
+            "status": 404,
+            "isMcp": false
+          },
+          {
+            "url": "https://orangeember.com/mcp/",
+            "method": "GET",
+            "status": 404,
+            "isMcp": false
+          },
+          {
+            "url": "https://orangeember.com/mcp/",
+            "method": "POST",
+            "status": 404,
+            "isMcp": false
+          },
+          {
+            "url": "https://orangeember.com/.well-known/mcp.json",
+            "method": "GET",
+            "status": 404,
+            "isMcp": false
+          }
+        ]
+      }
+    }
+  ]
+}
