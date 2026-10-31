@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
+import { format, t, type Locale } from '../../i18n/index.js';
 import { scan } from '../../scanner/index.js';
 import { normalizeUrl } from '../../scanner/types.js';
 import { scoreScan } from '../../scoring/index.js';
@@ -10,20 +11,29 @@ function makeId(url: URL, date: Date): string {
   return `${host}-${iso}`;
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+function informeUrl(origin: string, id: string, locale: Locale): string {
+  const prefix = locale === 'en' ? '/en' : '';
+  return `${origin}${prefix}/informe/${id}`;
+}
+
+export const POST: APIRoute = async ({ request }) => {
   let url: string | undefined;
+  let requestedLang: string | undefined;
   try {
     const body = await request.json();
     url = body.url;
+    requestedLang = body.lang;
   } catch {
-    return new Response(JSON.stringify({ error: 'El cuerpo debe ser JSON válido' }), {
+    return new Response(JSON.stringify({ error: t('es', 'errors', 'invalidJson') }), {
       status: 400,
       headers: { 'content-type': 'application/json' },
     });
   }
 
+  const locale: Locale = requestedLang === 'en' || requestedLang === 'es' ? requestedLang : 'es';
+
   if (!url || typeof url !== 'string') {
-    return new Response(JSON.stringify({ error: 'Se requiere el campo "url"' }), {
+    return new Response(JSON.stringify({ error: t(locale, 'errors', 'missingUrl') }), {
       status: 400,
       headers: { 'content-type': 'application/json' },
     });
@@ -33,7 +43,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   try {
     target = normalizeUrl(url);
   } catch {
-    return new Response(JSON.stringify({ error: 'La URL no es válida. Prueba con https://tusitio.com' }), {
+    return new Response(JSON.stringify({ error: t(locale, 'errors', 'invalidUrl') }), {
       status: 400,
       headers: { 'content-type': 'application/json' },
     });
@@ -51,7 +61,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const origin = new URL(request.url).origin;
-    const informeUrl = `${origin}/informe/${id}`;
+    const informeUrlValue = informeUrl(origin, id, locale);
 
     return new Response(
       JSON.stringify(
@@ -59,7 +69,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           id,
           score: scored.score,
           label: scored.label,
-          informe_url: informeUrl,
+          informe_url: informeUrlValue,
         },
         null,
         2
@@ -75,8 +85,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return new Response(
       JSON.stringify({
         error: isTimeout
-          ? 'El escaneo tardó demasiado. Intenta de nuevo en unos segundos.'
-          : `No pudimos escanear el sitio: ${message}`,
+          ? t(locale, 'errors', 'scanTimeout')
+          : format(t(locale, 'errors', 'scanFailed'), { message }),
       }),
       {
         status: isTimeout ? 504 : 500,

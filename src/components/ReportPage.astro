@@ -1,0 +1,456 @@
+---
+import '../styles/tokens.css';
+import ThemeInit from './ThemeInit.astro';
+import Header from './Header.astro';
+import { format, getLocalizedPath, getCheckExplanation, getStateLabel, t, type Locale } from '../i18n/index.js';
+import type { ScoreResult } from '../scoring/index.js';
+import type { ScanOutput } from '../scanner/types.js';
+
+interface Props {
+  locale: Locale;
+  id: string;
+  snapshot: ScanOutput;
+  result: ScoreResult;
+}
+
+const { locale, id, snapshot, result } = Astro.props;
+const origin = Astro.url.origin;
+const canonicalPath = getLocalizedPath(`/informe/${id}`, locale);
+const canonical = `${origin}${canonicalPath}`;
+const ogImageUrl = `${origin}/og-image.png`;
+const ogTitle = format(t(locale, 'informe', 'metaTitle'), { score: result.score, label: result.label });
+const ogDescription = format(t(locale, 'informe', 'metaDescription'), {
+  url: snapshot.url,
+  score: result.score,
+  label: result.label,
+});
+const ogLocale = t(locale, 'informe', 'ogLocale');
+
+const formattedDate = new Date(snapshot.date).toLocaleString(locale === 'es' ? 'es-CO' : 'en-US', {
+  dateStyle: 'long',
+  timeStyle: 'short',
+  timeZone: 'America/Bogota',
+});
+
+const gaugeRadius = 80;
+const gaugeArc = Math.PI * gaugeRadius;
+const gaugeOffset = gaugeArc * (1 - result.score / 100);
+
+function stateClass(state: string) {
+  if (state === 'ok') return 'state-ok';
+  if (state === 'parcial') return 'state-parcial';
+  return 'state-fallo';
+}
+
+function scoreState(score: number): 'ok' | 'parcial' | 'fallo' {
+  if (score >= 80) return 'ok';
+  if (score >= 50) return 'parcial';
+  return 'fallo';
+}
+
+const labelState = scoreState(result.score);
+const labelSubtitle =
+  labelState === 'ok'
+    ? t(locale, 'informe', 'labelSubtitleOk')
+    : labelState === 'parcial'
+      ? t(locale, 'informe', 'labelSubtitleParcial')
+      : t(locale, 'informe', 'labelSubtitleFallo');
+---
+
+<html lang={locale}>
+  <head>
+    <ThemeInit />
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{ogTitle}</title>
+    <meta name="description" content={ogDescription} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={`${origin}/informe/${id}`} />
+    <link rel="alternate" hreflang="en" href={`${origin}/en/informe/${id}`} />
+    <link rel="alternate" hreflang="x-default" href={`${origin}/informe/${id}`} />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={ogLocale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={ogDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+  </head>
+  <body>
+    <Header locale={locale} />
+
+    <main class="container">
+      <section class="report-card" aria-labelledby="report-title">
+        <div class="gauge-wrap">
+          <svg class="gauge" viewBox="0 0 200 120" role="img" aria-label={format(t(locale, 'informe', 'gaugeAria'), { score: result.score })}>
+            <defs>
+              <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff5a1f" />
+                <stop offset="100%" stop-color="#e8380d" />
+              </linearGradient>
+              <filter id="gaugeGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <path
+              d="M 20 100 A 80 80 0 0 1 180 100"
+              fill="none"
+              stroke="var(--gauge-track)"
+              stroke-width="12"
+              stroke-linecap="round"
+            />
+            <path
+              class="gauge-fill"
+              d="M 20 100 A 80 80 0 0 1 180 100"
+              fill="none"
+              stroke="url(#gaugeGradient)"
+              stroke-width="12"
+              stroke-linecap="round"
+              stroke-dasharray={gaugeArc}
+              stroke-dashoffset={gaugeOffset}
+              filter="url(#gaugeGlow)"
+            />
+          </svg>
+          <div class="gauge-score">
+            <span class="gauge-value">{result.score}</span>
+            <span class="gauge-max">/ 100</span>
+          </div>
+        </div>
+
+        <h1 id="report-title" class={`report-label ${stateClass(labelState)}`}>
+          {result.label}
+        </h1>
+        <p class="report-label-subtitle">({labelSubtitle})</p>
+        <p class="report-url">{snapshot.url}</p>
+        <p class="report-date">{format(t(locale, 'informe', 'reportDate'), { date: formattedDate })}</p>
+      </section>
+
+      <section class="breakdown-section" aria-labelledby="breakdown-title">
+        <h2 id="breakdown-title" class="section-title">{t(locale, 'informe', 'breakdownTitle')}</h2>
+        <div class="breakdown-list">
+          {
+            result.breakdown.map((item) => {
+              const pct = item.max ? Math.round((item.earned / item.max) * 100) : 0;
+              const explanation = getCheckExplanation(locale, item.id, item.state);
+              return (
+                <article class="check-card">
+                  <div class="check-header">
+                    <h3>{item.name}</h3>
+                    <div class="check-meta">
+                      <span class={`badge ${stateClass(item.state)}`}>{getStateLabel(locale, item.state)}</span>
+                      <span class="check-score">{Math.round(item.earned)} / {item.max}</span>
+                    </div>
+                  </div>
+                  <div class="bar-track">
+                    <div class={`bar-fill ${stateClass(item.state)}`} style={`width: ${pct}%`} />
+                  </div>
+                  <p class="check-explanation">{explanation}</p>
+                  <details class="check-detail-wrap">
+                    <summary>{t(locale, 'informe', 'detailShow')}</summary>
+                    <p class="check-detail-raw">{item.detail}</p>
+                  </details>
+                </article>
+              );
+            })
+          }
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <p>
+          {format(t(locale, 'informe', 'footerGeneratedBy'), { product: 'Listo Pa Bots' })} ·
+          <a href="https://orangeember.com">{t(locale, 'informe', 'footerStudio')}</a>
+        </p>
+      </footer>
+    </main>
+
+    <style is:global>
+      .container {
+        max-width: 720px;
+      }
+
+      .site-header {
+        padding: var(--space-md) 0;
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-md);
+      }
+
+      .header-controls {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+
+      .report-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg) var(--space-md);
+        box-shadow: var(--shadow);
+        text-align: center;
+        margin-bottom: var(--space-xl);
+      }
+
+      @media (min-width: 640px) {
+        .report-card {
+          padding: var(--space-xl);
+        }
+      }
+
+      .gauge-wrap {
+        position: relative;
+        max-width: 280px;
+        margin: 0 auto var(--space-sm);
+      }
+
+      .gauge {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .gauge-fill {
+        transition: stroke-dashoffset 1s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .gauge-score {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: baseline;
+        gap: 0.1em;
+      }
+
+      .gauge-value {
+        font-size: clamp(3rem, 12vw, 4.5rem);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+
+      .gauge-max {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+
+      .report-label {
+        display: inline-block;
+        margin: var(--space-md) 0 0;
+        padding: var(--space-xs) var(--space-md);
+        border-radius: var(--radius-pill);
+        font-size: clamp(1.25rem, 5vw, 1.75rem);
+        font-weight: 800;
+      }
+
+      .report-label.state-ok {
+        background: var(--state-ok-bg);
+        color: var(--state-ok);
+      }
+
+      .report-label.state-parcial {
+        background: var(--state-parcial-bg);
+        color: var(--state-parcial);
+      }
+
+      .report-label.state-fallo {
+        background: var(--state-fallo-bg);
+        color: var(--state-fallo);
+      }
+
+      .report-label-subtitle {
+        margin: var(--space-xs) 0 0;
+        color: var(--text-muted);
+        font-size: 0.9375rem;
+      }
+
+      .report-url {
+        margin: var(--space-sm) 0 0;
+        color: var(--text-muted);
+        font-size: 1rem;
+        word-break: break-all;
+      }
+
+      .report-date {
+        margin: var(--space-xs) 0 0;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+      }
+
+      .breakdown-section {
+        padding-bottom: var(--space-3xl);
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 var(--space-lg);
+      }
+
+      .breakdown-list {
+        display: grid;
+        gap: var(--space-md);
+      }
+
+      .check-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+      }
+
+      .check-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-sm);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-sm);
+      }
+
+      .check-header h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+      }
+
+      .check-meta {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: var(--radius-pill);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .badge.state-ok {
+        background: var(--state-ok-bg);
+        color: var(--state-ok);
+      }
+
+      .badge.state-parcial {
+        background: var(--state-parcial-bg);
+        color: var(--state-parcial);
+      }
+
+      .badge.state-fallo {
+        background: var(--state-fallo-bg);
+        color: var(--state-fallo);
+      }
+
+      .check-score {
+        font-weight: 700;
+        color: var(--text-muted);
+      }
+
+      .bar-track {
+        height: 8px;
+        border-radius: var(--radius-pill);
+        background: var(--bar-track-bg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        margin-bottom: var(--space-sm);
+      }
+
+      .bar-fill {
+        height: 100%;
+        border-radius: var(--radius-pill);
+        transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .bar-fill.state-ok {
+        background: var(--state-ok);
+        box-shadow: 0 0 12px rgba(52, 211, 153, 0.35);
+      }
+
+      .bar-fill.state-parcial {
+        background: var(--state-parcial);
+        box-shadow: 0 0 12px rgba(245, 166, 35, 0.35);
+      }
+
+      .bar-fill.state-fallo {
+        background: var(--state-fallo);
+        box-shadow: 0 0 12px rgba(248, 113, 113, 0.35);
+      }
+
+      .check-explanation {
+        margin: 0 0 var(--space-sm);
+        color: var(--text);
+        font-size: 0.9375rem;
+        line-height: 1.5;
+      }
+
+      .check-detail-wrap summary {
+        color: var(--accent-1);
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .check-detail-wrap summary:hover {
+        text-decoration: underline;
+      }
+
+      .check-detail-raw {
+        margin: var(--space-sm) 0 0;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+
+      .site-footer {
+        margin-top: var(--space-xl);
+        padding: var(--space-lg) 0 var(--space-2xl);
+        border-top: 1px solid var(--border);
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+      }
+
+      .site-footer a {
+        color: var(--text);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      .site-footer a:hover {
+        color: var(--accent-1);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .gauge-fill,
+        .bar-fill {
+          transition: none;
+        }
+      }
+    </style>
+  </body>
+</html>

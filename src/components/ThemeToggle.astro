@@ -1,9 +1,21 @@
+---
+import { t, type Locale } from '../i18n/index.js';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const label = t(locale, 'ui', 'themeToggleLabel');
+const title = t(locale, 'ui', 'themeToggleTitle');
+---
+
 <button
   type="button"
   class="theme-toggle"
   data-theme-toggle
-  aria-label="Cambiar entre tema claro y oscuro"
-  title="Cambiar tema"
+  aria-label={label}
+  title={title}
 >
   <span class="icon icon-sun" aria-hidden="true">
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

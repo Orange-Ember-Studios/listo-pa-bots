@@ -1,0 +1,21 @@
+---
+export const prerender = false;
+
+import ReportPage from '../../../components/ReportPage.astro';
+import { getReportById } from '../../../lib/reports.js';
+import { scoreScan } from '../../../scoring/index.js';
+
+const id = Astro.params.id;
+if (!id) {
+  return new Response('Report not found', { status: 404 });
+}
+
+const snapshot = await getReportById(id, Astro.url.origin);
+if (!snapshot) {
+  return new Response('Report not found', { status: 404 });
+}
+
+const result = scoreScan(snapshot);
+---
+
+<ReportPage locale="en" id={id} snapshot={snapshot} result={result} />

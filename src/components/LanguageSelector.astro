@@ -1,0 +1,87 @@
+---
+import type { Locale } from '../i18n/index.js';
+import { getLocalizedPath, t } from '../i18n/index.js';
+
+interface Props {
+  locale: Locale;
+  currentPath: string;
+}
+
+const { locale, currentPath } = Astro.props;
+const label = t(locale, 'ui', 'languageLabel');
+const languages: { code: Locale; label: string }[] = [
+  { code: 'es', label: t(locale, 'ui', 'languageEs') },
+  { code: 'en', label: t(locale, 'ui', 'languageEn') },
+];
+---
+
+<div class="language-selector" role="group" aria-label={label}>
+  {
+    languages.map(({ code, label }) => {
+      const href = getLocalizedPath(currentPath, code);
+      const isActive = code === locale;
+      return (
+        <a
+          href={href}
+          class={`lang-link${isActive ? ' is-active' : ''}`}
+          hreflang={code}
+          aria-current={isActive ? 'page' : undefined}
+          data-lang-link
+          data-lang={code}
+        >
+          {label}
+        </a>
+      );
+    })
+  }
+</div>
+
+<style>
+  .language-selector {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+  }
+
+  .lang-link {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.25rem;
+    height: 1.75rem;
+    padding: 0 0.5rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--text-muted);
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .lang-link:hover {
+    color: var(--text);
+  }
+
+  .lang-link.is-active {
+    background: var(--accent-gradient);
+    color: #fff;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll('[data-lang-link]').forEach(function (link) {
+      link.addEventListener('click', function () {
+        try {
+          var lang = link.getAttribute('data-lang');
+          if (lang) {
+            document.cookie = 'lpb-locale=' + encodeURIComponent(lang) + ';path=/;max-age=31536000;samesite=lax';
+          }
+        } catch {}
+      });
+    });
+  })();
+</script>
