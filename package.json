@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "scan": "tsx scripts/scan.ts"
+    "scan": "tsx scripts/scan.ts",
+    "report": "tsx scripts/report.ts"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.4.3",
