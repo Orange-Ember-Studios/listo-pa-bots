@@ -1,0 +1,34 @@
+<a href="/" class="wordmark" aria-label="Listo Pa Bots — inicio">
+  <span class="wordmark-listo">Listo</span>
+  <span class="wordmark-pabots">Pa Bots</span>
+</a>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.15em;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .wordmark-listo {
+    color: var(--text);
+  }
+
+  .wordmark-pabots {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  @media (min-width: 640px) {
+    .wordmark {
+      font-size: 1.5rem;
+    }
+  }
+</style>

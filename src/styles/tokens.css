@@ -1,0 +1,117 @@
+@import '@fontsource-variable/nunito';
+
+/*
+  Design tokens — Listo Pa Bots
+  Dark is the brand default; light is overridden via [data-theme='light'].
+  Keep this file framework-free: only custom properties, fonts, and minimal reset.
+*/
+
+:root {
+  --font: 'Nunito Variable', 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Brand fire gradient */
+  --accent-1: #ff5a1f;
+  --accent-2: #e8380d;
+  --accent-gradient: linear-gradient(135deg, #ff5a1f 0%, #e8380d 100%);
+  --accent-glow: rgba(255, 90, 31, 0.35);
+
+  /* Gold accent (used sparingly: eyebrow, tags) */
+  --accent-secondary: #f5a623;
+  --accent-secondary-glow: rgba(245, 166, 35, 0.25);
+
+  /* State colors — AA safe on both backgrounds */
+  --state-ok: #34d399;
+  --state-ok-bg: rgba(52, 211, 153, 0.12);
+  --state-parcial: #f5a623;
+  --state-parcial-bg: rgba(245, 166, 35, 0.12);
+  --state-fallo: #f87171;
+  --state-fallo-bg: rgba(248, 113, 113, 0.12);
+
+  /* Spacing scale */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  /* Radii */
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-pill: 999px;
+
+  /* Dark theme (default) */
+  --bg: #0a0a0f;
+  --bg-elevated: #12121a;
+  --bg-radial: radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.14), transparent 55%), var(--bg);
+  --text: #f2f2f5;
+  --text-muted: #b7b7c0;
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  --bar-track-bg: rgba(255, 255, 255, 0.20);
+  --gauge-track: rgba(255, 255, 255, 0.25);
+}
+
+[data-theme='light'] {
+  --bg: #faf7f4;
+  --bg-elevated: #ffffff;
+  --bg-radial: radial-gradient(ellipse at 50% 0%, rgba(255, 90, 31, 0.08), transparent 50%), var(--bg);
+  --text: #1a1a1a;
+  --text-muted: #4f4b56;
+  --border: rgba(0, 0, 0, 0.08);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.08);
+  --bar-track-bg: rgba(0, 0, 0, 0.10);
+  --gauge-track: rgba(0, 0, 0, 0.10);
+
+  --accent-glow: rgba(255, 90, 31, 0.22);
+  --accent-secondary-glow: rgba(245, 166, 35, 0.18);
+
+  --state-ok: #059669;
+  --state-ok-bg: rgba(5, 150, 105, 0.10);
+  --state-parcial: #b45309;
+  --state-parcial-bg: rgba(180, 83, 9, 0.10);
+  --state-fallo: #dc2626;
+  --state-fallo-bg: rgba(220, 38, 38, 0.10);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg-radial);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  font: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
