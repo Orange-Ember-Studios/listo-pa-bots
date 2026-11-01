@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Concepto C (v2): Ventana de sitio web "listo" con check -->
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5a1f"/>
+      <stop offset="100%" stop-color="#e8380d"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="128" height="128" rx="30" fill="#0a0a0f"/>
+  <!-- ventana -->
+  <rect x="22" y="32" width="84" height="64" rx="12" fill="#12121a" stroke="#ff5a1f" stroke-width="5"/>
+  <rect x="22" y="32" width="84" height="16" rx="12" fill="url(#g)"/>
+  <rect x="22" y="40" width="84" height="8" fill="url(#g)"/>
+  <!-- puntos de ventana -->
+  <circle cx="34" cy="40" r="4" fill="#ffffff"/>
+  <circle cx="46" cy="40" r="4" fill="#ffffff" opacity="0.85"/>
+  <circle cx="58" cy="40" r="4" fill="#ffffff" opacity="0.7"/>
+  <!-- check centrado en el contenido -->
+  <path d="M51.5 72.5 L60.5 81.5 L77.5 61.5" stroke="url(#g)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
