@@ -5,12 +5,14 @@ import Header from './Header.astro';
 import Footer from './Footer.astro';
 import { implementationTiers, monitoringPlans, pricingNote, formatPrice } from '../data/pricing.js';
 import { getLocalizedPath, t, type Locale } from '../i18n/index.js';
+import { getScanCountFromEnv } from '../lib/rate-limit.js';
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
+const scanCount = await getScanCountFromEnv();
 const origin = Astro.url.origin;
 const canonicalPath = getLocalizedPath('/implementacion', locale);
 const canonical = `${origin}${canonicalPath}`;
@@ -207,7 +209,7 @@ const messages = {
         </div>
       </section>
 
-      <Footer locale={locale} currentPath={canonicalPath} />
+      <Footer locale={locale} currentPath={canonicalPath} scanCount={scanCount} />
     </main>
 
     <style is:global>

@@ -4,6 +4,7 @@ import ThemeInit from './ThemeInit.astro';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
 import { getLocalizedPath, t, type Locale } from '../i18n/index.js';
+import { getScanCountFromEnv } from '../lib/rate-limit.js';
 
 interface Props {
   locale: Locale;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const { locale, metaTitle, metaDescription, pageTitle, canonicalPath } = Astro.props;
+const scanCount = await getScanCountFromEnv();
 const origin = Astro.url.origin;
 const canonical = `${origin}${canonicalPath}`;
 const ogImage = `${origin}/og-image.png`;
@@ -69,7 +71,7 @@ const ogLocale = t(locale, 'legal', 'lastUpdated');
         <slot />
       </article>
 
-      <Footer locale={locale} currentPath={canonicalPath} />
+      <Footer locale={locale} currentPath={canonicalPath} scanCount={scanCount} />
     </main>
 
     <style is:global>

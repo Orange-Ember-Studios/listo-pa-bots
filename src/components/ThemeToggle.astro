@@ -93,25 +93,22 @@ const title = t(locale, 'ui', 'themeToggleTitle');
   }
 </style>
 
-<script is:inline>
-  (function () {
-    var buttons = document.querySelectorAll('[data-theme-toggle]');
-    if (!buttons.length) return;
+<script>
+  // Un solo listener global con delegación: aunque <ThemeToggle /> se renderice
+  // dos veces (header + footer), Astro deduplica este script y el toggle nunca
+  // se ejecuta en cascada (antes, 2 listeners por botón deshacían el click).
+  function apply(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch {}
+  }
 
-    function apply(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      try {
-        localStorage.setItem('theme', theme);
-      } catch {}
-    }
+  document.addEventListener('click', (event) => {
+    const button = (event.target as Element | null)?.closest?.('[data-theme-toggle]');
+    if (!button) return;
 
-    function toggle() {
-      var current = document.documentElement.getAttribute('data-theme') || 'dark';
-      apply(current === 'dark' ? 'light' : 'dark');
-    }
-
-    buttons.forEach(function (btn) {
-      btn.addEventListener('click', toggle);
-    });
-  })();
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    apply(current === 'dark' ? 'light' : 'dark');
+  });
 </script>
