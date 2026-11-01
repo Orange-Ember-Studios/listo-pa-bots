@@ -1,9 +1,105 @@
 import type { ScanOutput } from '../scanner/types.js';
+import { normalizeUrl } from '../scanner/types.js';
+import { scoreScan } from '../scoring/index.js';
 
 export function makeReportId(url: URL, date: Date): string {
   const host = url.hostname.replace(/^www\./, '');
   const iso = date.toISOString().replace(/[:.]/g, '-').slice(0, 19);
   return `${host}-${iso}`;
+}
+
+export interface ReportKv {
+  get: (key: string) => Promise<string | null>;
+  put: (key: string, value: string, opts?: { expirationTtl?: number }) => Promise<void>;
+  delete?: (key: string) => Promise<void>;
+  list: (options?: { prefix?: string; limit?: number; cursor?: string }) => Promise<{
+    keys: Array<{ name: string; expiration?: number; metadata?: unknown }>;
+    list_complete: boolean;
+    cursor?: string;
+  }>;
+}
+
+export interface SnapshotPoint {
+  id: string;
+  key: string;
+  snapshot: ScanOutput;
+  score: number;
+  date: Date;
+}
+
+export interface HistoryPoint {
+  id: string;
+  score: number;
+  date: string; // ISO 8601
+}
+
+export async function saveSnapshot(kv: ReportKv, snapshot: ScanOutput): Promise<{ id: string; key: string }> {
+  const target = normalizeUrl(snapshot.url);
+  const id = makeReportId(target, new Date(snapshot.date));
+  const key = `informe/${id}`;
+  await kv.put(key, JSON.stringify(snapshot));
+  return { id, key };
+}
+
+export async function getDomainSnapshots(
+  kv: ReportKv,
+  domain: string,
+  limit: number = 12
+): Promise<SnapshotPoint[]> {
+  const normalized = domain.toLowerCase().replace(/^www\./, '');
+  const prefix = `informe/${normalized}-`;
+  const keys: string[] = [];
+  let cursor: string | undefined;
+  do {
+    const page = await kv.list({ prefix, limit: 100, cursor });
+    for (const key of page.keys) {
+      keys.push(key.name);
+    }
+    cursor = page.list_complete ? undefined : page.cursor;
+  } while (cursor);
+
+  const points: SnapshotPoint[] = [];
+  for (const key of keys) {
+    const raw = await kv.get(key);
+    if (!raw) continue;
+    try {
+      const snapshot = JSON.parse(raw) as ScanOutput;
+      const scored = scoreScan(snapshot);
+      const id = key.slice('informe/'.length);
+      points.push({
+        id,
+        key,
+        snapshot,
+        score: scored.score,
+        date: new Date(snapshot.date),
+      });
+    } catch {
+      // skip malformed snapshots
+    }
+  }
+
+  points.sort((a, b) => a.date.getTime() - b.date.getTime());
+  return points.slice(-limit);
+}
+
+export function buildHistory(snapshots: SnapshotPoint[]): HistoryPoint[] {
+  return snapshots.map((point) => ({
+    id: point.id,
+    score: point.score,
+    date: point.snapshot.date,
+  }));
+}
+
+export async function getDomainHistory(
+  domain: string,
+  _origin: string,
+  limit: number = 12
+): Promise<HistoryPoint[]> {
+  const env = await getWorkersEnv();
+  const kv = env?.REPORTS as ReportKv | undefined;
+  if (!kv?.get || !kv?.list) return [];
+  const snapshots = await getDomainSnapshots(kv, domain, limit);
+  return buildHistory(snapshots);
 }
 
 /**

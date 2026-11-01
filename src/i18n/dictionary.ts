@@ -82,6 +82,8 @@ export interface Dictionary {
     badgeTitle: string;
     badgeCopy: string;
     badgeCopied: string;
+    scoreHistoryTitle: string;
+    scoreHistoryAlert: string;
   };
   implementation: {
     metaTitle: string;

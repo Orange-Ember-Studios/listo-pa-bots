@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import ReportPage from '../../components/ReportPage.astro';
-import { getReportById } from '../../lib/reports.js';
+import { getReportById, getDomainHistory } from '../../lib/reports.js';
 import { scoreScan } from '../../scoring/index.js';
 
 const id = Astro.params.id;
@@ -16,6 +16,15 @@ if (!snapshot) {
 }
 
 const result = scoreScan(snapshot);
+
+let domain = '';
+try {
+  domain = new URL(snapshot.url).hostname.replace(/^www\./, '');
+} catch {
+  domain = '';
+}
+
+const history = domain ? await getDomainHistory(domain, Astro.url.origin, 12) : [];
 ---
 
-<ReportPage locale="es" id={id} snapshot={snapshot} result={result} />
+<ReportPage locale="es" id={id} snapshot={snapshot} result={result} history={history} />

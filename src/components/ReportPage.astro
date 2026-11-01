@@ -7,15 +7,17 @@ import { format, getLocalizedPath, getCheckExplanation, getStateLabel, t, type L
 import { getScanCountFromEnv } from '../lib/rate-limit.js';
 import type { ScoreResult } from '../scoring/index.js';
 import type { ScanOutput } from '../scanner/types.js';
+import type { HistoryPoint } from '../lib/reports.js';
 
 interface Props {
   locale: Locale;
   id: string;
   snapshot: ScanOutput;
   result: ScoreResult;
+  history?: HistoryPoint[];
 }
 
-const { locale, id, snapshot, result } = Astro.props;
+const { locale, id, snapshot, result, history = [] } = Astro.props;
 const origin = Astro.url.origin;
 const canonicalPath = getLocalizedPath(`/informe/${id}`, locale);
 const canonical = `${origin}${canonicalPath}`;
@@ -69,6 +71,35 @@ const labelSubtitle =
     : labelState === 'parcial'
       ? t(locale, 'informe', 'labelSubtitleParcial')
       : t(locale, 'informe', 'labelSubtitleFallo');
+
+const hasHistory = history.length >= 2;
+const lastDelta = hasHistory ? history[history.length - 1].score - history[history.length - 2].score : undefined;
+const showAlert = lastDelta !== undefined && lastDelta < 0;
+
+const chartWidth = 280;
+const chartHeight = 72;
+const chartPaddingBottom = 18;
+const plotHeight = chartHeight - chartPaddingBottom;
+const barGap = 4;
+const barCount = Math.max(hasHistory ? history.length : 0, 1);
+const barWidth = barCount > 0 ? (chartWidth - barGap * (barCount - 1)) / barCount : 0;
+
+function barY(score: number): number {
+  return plotHeight - (score / 100) * plotHeight;
+}
+
+function barX(index: number): number {
+  return index * (barWidth + barGap);
+}
+
+function shortDate(iso: string, localeCode: Locale): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString(localeCode === 'es' ? 'es-CO' : 'en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
 ---
 
 <html lang={locale}>
@@ -149,6 +180,47 @@ const labelSubtitle =
         <p class="report-label-subtitle">({labelSubtitle})</p>
         <p class="report-url">{snapshot.url}</p>
         <p class="report-date">{format(t(locale, 'informe', 'reportDate'), { date: formattedDate })}</p>
+
+        {
+          hasHistory && (
+            <div class="score-history">
+              <h2 class="history-title">{t(locale, 'informe', 'scoreHistoryTitle')}</h2>
+              <svg
+                class="history-chart"
+                viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+                role="img"
+                aria-label={t(locale, 'informe', 'scoreHistoryTitle')}
+              >
+                {history.map((point, index) => {
+                  const isLast = index === history.length - 1;
+                  const x = barX(index);
+                  const y = barY(point.score);
+                  const height = plotHeight - y;
+                  return (
+                    <g key={point.id}>
+                      <rect
+                        x={x}
+                        y={y}
+                        width={Math.max(barWidth, 0)}
+                        height={Math.max(height, 0)}
+                        rx={2}
+                        class={`history-bar ${isLast ? 'history-bar-last' : ''}`}
+                      />
+                      <text x={x + barWidth / 2} y={chartHeight - 4} class="history-label">
+                        {shortDate(point.date, locale)}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+              {showAlert && lastDelta !== undefined && (
+                <p class="history-alert">
+                  {format(t(locale, 'informe', 'scoreHistoryAlert'), { delta: String(Math.abs(lastDelta)) })}
+                </p>
+              )}
+            </div>
+          )
+        }
       </section>
 
       <section class="breakdown-section" aria-labelledby="breakdown-title">
@@ -500,6 +572,49 @@ const labelSubtitle =
         font-size: 0.875rem;
         line-height: 1.5;
         white-space: pre-wrap;
+      }
+
+      .score-history {
+        margin-top: var(--space-lg);
+        text-align: center;
+      }
+
+      .history-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 var(--space-sm);
+        color: var(--text);
+      }
+
+      .history-chart {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .history-bar {
+        fill: var(--text-muted);
+        opacity: 0.7;
+      }
+
+      .history-bar-last {
+        fill: url(#gaugeGradient);
+        opacity: 1;
+      }
+
+      .history-label {
+        font-size: 8px;
+        fill: var(--text-muted);
+        text-anchor: middle;
+      }
+
+      .history-alert {
+        margin: var(--space-sm) 0 0;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--accent-1);
       }
 
       @media (prefers-reduced-motion: reduce) {

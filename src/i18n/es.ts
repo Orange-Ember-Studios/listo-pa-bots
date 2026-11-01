@@ -163,6 +163,8 @@ export const es: Dictionary = {
     badgeTitle: 'Agrega tu badge',
     badgeCopy: 'Copiar snippet',
     badgeCopied: 'Copiado',
+    scoreHistoryTitle: 'Evolución del puntaje',
+    scoreHistoryAlert: 'El puntaje bajó {delta} pts — te sugerimos revisar',
   },
   implementation: {
     metaTitle: 'Implementación — Listo Pa Bots',

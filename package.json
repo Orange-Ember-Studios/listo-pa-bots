@@ -12,6 +12,7 @@
     "astro": "astro",
     "scan": "tsx scripts/scan.ts",
     "report": "tsx scripts/report.ts",
+    "monitor": "tsx scripts/monitor.ts",
     "test": "vitest run"
   },
   "dependencies": {

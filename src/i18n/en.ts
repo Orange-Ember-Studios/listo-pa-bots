@@ -163,6 +163,8 @@ export const en: Dictionary = {
     badgeTitle: 'Add your badge',
     badgeCopy: 'Copy snippet',
     badgeCopied: 'Copied',
+    scoreHistoryTitle: 'Score history',
+    scoreHistoryAlert: 'Score dropped {delta} pts — we suggest reviewing',
   },
   implementation: {
     metaTitle: 'Implementation — Listo Pa Bots',

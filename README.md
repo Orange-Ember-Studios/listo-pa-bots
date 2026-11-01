@@ -68,15 +68,39 @@ src/
 scripts/scan.ts     # CLI de prueba
 ```
 
+## Monitoreo programado
+
+El endpoint `/api/monitor` permite administrar dominios que se re-escanean automáticamente:
+
+```bash
+# Añadir un dominio a monitoreo semanal
+npm run monitor -- add https://orangeember.com weekly
+
+# Ejecutar los escaneos que estén vencidos
+npm run monitor -- run
+
+# Listar dominios monitoreados
+npm run monitor -- list
+
+# Quitar un dominio del monitoreo
+npm run monitor -- remove https://orangeember.com
+```
+
+El token se lee de la variable `LISTO_ADMIN_TOKEN` en `/opt/data/.env`. El scheduler real es un cronjob externo (Hermes) que hace `POST /api/monitor` con `action=run` una vez al día; el endpoint es idempotente.
+
 ## Despliegue
 
-El proyecto usa Astro con el adapter de Cloudflare Workers. No se despliega en esta semana; solo se configura el build local:
+El proyecto usa Astro con el adapter de Cloudflare Workers. Build local:
 
 ```bash
 npm run build
 ```
 
-Para publicar después se usará `wrangler deploy` (requiere autenticación).
+Deploy a producción:
+
+```bash
+npm run build && npx wrangler deploy
+```
 
 ## Convención de JSON
 

@@ -4,12 +4,11 @@ import { format, t, type Locale } from '../../i18n/index.js';
 import { scan } from '../../scanner/index.js';
 import { normalizeUrl } from '../../scanner/types.js';
 import { scoreScan } from '../../scoring/index.js';
-import { makeReportId } from '../../lib/reports.js';
+import { saveSnapshot, type ReportKv } from '../../lib/reports.js';
 import {
   checkScanRateLimit,
   incrementScanStats,
   recordScanAttempt,
-  type RateLimitKv,
 } from '../../lib/rate-limit.js';
 
 export const prerender = false;
@@ -19,10 +18,10 @@ function informeUrl(origin: string, id: string, locale: Locale): string {
   return `${origin}${prefix}/informe/${id}`;
 }
 
-function getReportsKv(): RateLimitKv | null {
-  const kv = env.REPORTS as { get?: (key: string) => Promise<string | null>; put?: (key: string, value: string, opts?: { expirationTtl?: number }) => Promise<void> } | undefined;
-  if (!kv?.get || !kv?.put) return null;
-  return kv as RateLimitKv;
+function getReportsKv(): ReportKv | null {
+  const kv = env.REPORTS as ReportKv | undefined;
+  if (!kv?.get || !kv?.put || !kv?.list) return null;
+  return kv;
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -82,13 +81,16 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const snapshot = await scan({ url: target.toString() });
     const scored = scoreScan(snapshot);
-    const id = makeReportId(target, new Date(snapshot.date));
-    const key = `informe/${id}`;
 
+    let id: string | undefined;
     if (kv) {
       await recordScanAttempt(kv, request);
       await incrementScanStats(kv);
-      await kv.put(key, JSON.stringify(snapshot));
+      const saved = await saveSnapshot(kv, snapshot);
+      id = saved.id;
+    } else {
+      const fallback = await import('../../lib/reports.js');
+      id = fallback.makeReportId(target, new Date(snapshot.date));
     }
 
     const origin = new URL(request.url).origin;
