@@ -27,10 +27,8 @@ export interface AlertRecord {
   date: string; // ISO 8601
 }
 
-export interface MonitorKv extends ReportKv {}
-
-export interface SnapshotPointLocal extends SnapshotPoint {}
-export interface HistoryPointLocal extends HistoryPoint {}
+export type MonitorKv = ReportKv;
+export type { SnapshotPoint, HistoryPoint };
 
 export interface MonitorRunResult {
   domain: string;
@@ -48,13 +46,12 @@ export interface MonitorRunSummary {
 export function normalizeDomain(input: string): string {
   const trimmed = input.trim().toLowerCase();
   const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-  let url: URL;
   try {
-    url = new URL(withScheme);
+    const url = new URL(withScheme);
+    return url.hostname.replace(/^www\./, '');
   } catch {
     throw new Error(`invalid_url: ${input}`);
   }
-  return url.hostname.replace(/^www\./, '');
 }
 
 export function monitorKey(domain: string): string {
@@ -71,21 +68,29 @@ export function isMonitorDue(record: MonitoredDomain, now: Date = new Date()): b
   const last = new Date(record.last_scan);
   if (Number.isNaN(last.getTime())) return true;
   const elapsedMs = now.getTime() - last.getTime();
-  const thresholdMs = record.frequency === 'monthly' ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000;
+  const thresholdMs = record.frequency === 'monthly'
+    ? 30 * 24 * 60 * 60 * 1000
+    : 7 * 24 * 60 * 60 * 1000;
   return elapsedMs > thresholdMs;
 }
 
-export async function saveSnapshot(kv: MonitorKv, snapshot: ScanOutput): Promise<{ id: string; key: string }> {
+export async function saveSnapshot(
+  kv: MonitorKv,
+  snapshot: ScanOutput
+): Promise<{ id: string; key: string }> {
   return sharedSaveSnapshot(kv, snapshot);
 }
 
-export async function listMonitored(kv: MonitorKv): Promise<Array<{ domain: string; record: MonitoredDomain }>> {
+export async function listMonitored(
+  kv: MonitorKv
+): Promise<Array<{ domain: string; record: MonitoredDomain }>> {
   const results: Array<{ domain: string; record: MonitoredDomain }> = [];
   let cursor: string | undefined;
   do {
     const page = await kv.list({ prefix: 'monitored/', limit: 100, cursor });
     for (const key of page.keys) {
       const domain = key.name.slice('monitored/'.length);
+      if (!domain) continue;
       const raw = await kv.get(key.name);
       if (!raw) continue;
       try {
@@ -127,7 +132,13 @@ export function buildHistory(snapshots: SnapshotPoint[]): HistoryPoint[] {
 }
 
 export interface Emailer {
-  sendAlert: (opts: { domain: string; previous: number; score: number; delta: number; date: Date }) => Promise<void>;
+  sendAlert: (opts: {
+    domain: string;
+    previous: number;
+    score: number;
+    delta: number;
+    date: Date;
+  }) => Promise<void>;
 }
 
 export async function runMonitors(
@@ -211,7 +222,10 @@ export async function addMonitor(
   return { domain };
 }
 
-export async function removeMonitor(kv: MonitorKv, url: string): Promise<{ domain: string; removed: boolean }> {
+export async function removeMonitor(
+  kv: MonitorKv,
+  url: string
+): Promise<{ domain: string; removed: boolean }> {
   const domain = normalizeDomain(url);
   const key = monitorKey(domain);
   const existing = await kv.get(key);
