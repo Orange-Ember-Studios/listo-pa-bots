@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Listo Pa Bots — marca del bot (favicon y uso inline). Optimizada para legibilidad a 16px. -->
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5a1f"/>
+      <stop offset="100%" stop-color="#e8380d"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="30" fill="#0a0a0f"/>
+  <!-- antena -->
+  <path d="M64 34 V24" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="64" cy="17" r="8" fill="url(#g)"/>
+  <!-- cabeza -->
+  <rect x="30" y="34" width="68" height="60" rx="20" fill="url(#g)"/>
+  <!-- ojos -->
+  <circle cx="49" cy="63" r="10" fill="#0a0a0f"/>
+  <circle cx="79" cy="63" r="10" fill="#0a0a0f"/>
+  <!-- sonrisa -->
+  <path d="M46 77 Q64 88 82 77" stroke="#0a0a0f" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>

@@ -10,6 +10,7 @@ const homeLabel = locale === 'en' ? 'home' : 'inicio';
 ---
 
 <a href={locale === 'en' ? '/en/' : '/'} class="wordmark" aria-label={`Listo Pa Bots — ${homeLabel}`}>
+  <img src="/bot-mark.svg" alt="" width="28" height="28" class="wordmark-icon" />
   <span class="wordmark-listo">Listo</span>
   <span class="wordmark-pabots">Pa Bots</span>
 </a>
@@ -24,6 +25,14 @@ const homeLabel = locale === 'en' ? 'home' : 'inicio';
     letter-spacing: -0.02em;
     text-decoration: none;
     color: var(--text);
+  }
+
+  .wordmark-icon {
+    align-self: center;
+    width: 1.5em;
+    height: 1.5em;
+    margin-right: 0.35em;
+    border-radius: 0.42em;
   }
 
   .wordmark-listo {

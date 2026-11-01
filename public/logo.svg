@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Listo Pa Bots — logo completo con badge de verificación (OG, badge de monitoreo, GitHub) -->
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5a1f"/>
+      <stop offset="100%" stop-color="#e8380d"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="30" fill="#0a0a0f"/>
+  <!-- antena -->
+  <path d="M64 36 V24" stroke="url(#g)" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="64" cy="18.5" r="7.5" fill="url(#g)"/>
+  <!-- cabeza -->
+  <rect x="26" y="36" width="76" height="58" rx="18" fill="url(#g)"/>
+  <!-- ojos -->
+  <circle cx="49" cy="62" r="7.5" fill="#0a0a0f"/>
+  <circle cx="79" cy="62" r="7.5" fill="#0a0a0f"/>
+  <!-- sonrisa -->
+  <path d="M48 75 Q64 85 80 75" stroke="#0a0a0f" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+  <!-- badge de check -->
+  <circle cx="96" cy="96" r="18" fill="#ffffff" stroke="#0a0a0f" stroke-width="5"/>
+  <path d="M88.5 96.5 L94.5 102.5 L105 90.5" stroke="#e8380d" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
